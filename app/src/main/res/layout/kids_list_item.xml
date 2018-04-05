@@ -43,7 +43,7 @@
         android:textSize="14sp"
         android:textAllCaps="true"
         android:textStyle="bold"
-        tools:text="firstName lastName"/>
+        tools:text="AMIR KAREEM ABDOU"/>
 
     <!-- NCMC ID -->
     <TextView
