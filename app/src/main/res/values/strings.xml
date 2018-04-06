@@ -1,3 +1,17 @@
 <resources>
     <string name="app_name">Missing Kids</string>
+
+
+    <!-- Detail View Detail labels-->
+    <string name="missing_date_label">Missing Since:</string>
+    <string name="missing_from_label">Missing From:</string>
+    <string name="dob_label">DOB:</string>
+    <string name="age_now_label">Age Now:</string>
+    <string name="sex_label">Sex:</string>
+    <string name="race_label">Race:</string>
+    <string name="hair_color_label">Hair Color:</string>
+    <string name="eye_color_label">Eye Color:</string>
+    <string name="height_label">Height:</string>
+    <string name="weight_label">Weight:</string>
+
 </resources>

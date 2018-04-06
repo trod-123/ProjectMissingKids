@@ -9,11 +9,242 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <android.support.constraint.Guideline
+            android:id="@+id/guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.5"/>
+
+        <!-- Missing Since Label -->
         <TextView
             android:id="@+id/missing_since"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            tools:text="Missing Since:"/>
+            android:text="@string/missing_date_label"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintRight_toRightOf="@+id/guideline"
+            android:layout_marginTop="16dp"
+            android:layout_marginRight="16dp"
+            tools:text="Missing Since:" />
+
+        <!--Missing since value -->
+        <TextView
+            android:id="@+id/missing_since_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@+id/missing_since"
+            app:layout_constraintLeft_toRightOf="@+id/guideline"
+            android:layout_marginLeft="16dp"
+            tools:text="Apr 30, 2003"
+            android:textStyle="bold"/>
+
+        <!-- Missing From Label -->
+        <TextView
+            android:id="@+id/missing_from"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/missing_from_label"
+            app:layout_constraintTop_toTopOf="@+id/missing_since"
+            app:layout_constraintRight_toRightOf="@+id/guideline"
+            android:layout_marginTop="22dp"
+            android:layout_marginRight="16dp"
+            tools:text="Missing From:"/>
+
+        <!--Missing from value -->
+        <TextView
+            android:id="@+id/missing_from_location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@+id/missing_from"
+            app:layout_constraintLeft_toRightOf="@+id/guideline"
+            android:layout_marginLeft="16dp"
+            tools:text="San Ramon, CA"
+            android:textStyle="bold"/>
+
+        <!-- DOB Label -->
+        <TextView
+            android:id="@+id/dob_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/dob_label"
+            app:layout_constraintTop_toTopOf="@+id/missing_from"
+            app:layout_constraintRight_toRightOf="@+id/guideline"
+            android:layout_marginTop="22dp"
+            android:layout_marginRight="16dp"
+            tools:text="DOB:"/>
+
+        <!-- DOB value -->
+        <TextView
+            android:id="@+id/dob_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@+id/dob_label"
+            app:layout_constraintLeft_toRightOf="@+id/guideline"
+            android:layout_marginLeft="16dp"
+            tools:text="May 27, 2001"
+            android:textStyle="bold"/>
+
+        <!-- Age Now Label -->
+        <TextView
+            android:id="@+id/age_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/age_now_label"
+            app:layout_constraintTop_toTopOf="@+id/dob_label"
+            app:layout_constraintRight_toRightOf="@+id/guideline"
+            android:layout_marginTop="22dp"
+            android:layout_marginRight="16dp"
+            tools:text="Age Now:"/>
+
+        <!-- Age Now value -->
+        <TextView
+            android:id="@+id/age_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@+id/age_label"
+            app:layout_constraintLeft_toRightOf="@+id/guideline"
+            android:layout_marginLeft="16dp"
+            tools:text="16"
+            android:textStyle="bold"/>
+
+        <!-- Sex Label -->
+        <TextView
+            android:id="@+id/sex_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/sex_label"
+            app:layout_constraintTop_toTopOf="@+id/age_label"
+            app:layout_constraintRight_toRightOf="@+id/guideline"
+            android:layout_marginTop="22dp"
+            android:layout_marginRight="16dp"
+            tools:text="Sex:"/>
+
+        <!-- Sex value -->
+        <TextView
+            android:id="@+id/sex_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@+id/sex_label"
+            app:layout_constraintLeft_toRightOf="@+id/guideline"
+            android:layout_marginLeft="16dp"
+            tools:text="Male"
+            android:textStyle="bold"/>
+
+        <!-- Race Label -->
+        <TextView
+            android:id="@+id/race_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/race_label"
+            app:layout_constraintTop_toTopOf="@+id/sex_label"
+            app:layout_constraintRight_toRightOf="@+id/guideline"
+            android:layout_marginTop="22dp"
+            android:layout_marginRight="16dp"
+            tools:text="Race:"/>
+
+        <!-- Race value -->
+        <TextView
+            android:id="@+id/race_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@+id/race_label"
+            app:layout_constraintLeft_toRightOf="@+id/guideline"
+            android:layout_marginLeft="16dp"
+            tools:text="White"
+            android:textStyle="bold"/>
+
+        <!-- Hair Color Label -->
+        <TextView
+            android:id="@+id/hair_color_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/hair_color_label"
+            app:layout_constraintTop_toTopOf="@+id/race_label"
+            app:layout_constraintRight_toRightOf="@+id/guideline"
+            android:layout_marginTop="22dp"
+            android:layout_marginRight="16dp"
+            tools:text="Hair Color:"/>
+
+        <!-- Hair color value -->
+        <TextView
+            android:id="@+id/hair_color_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@+id/hair_color_label"
+            app:layout_constraintLeft_toRightOf="@+id/guideline"
+            android:layout_marginLeft="16dp"
+            tools:text="Black"
+            android:textStyle="bold"/>
+
+        <!-- Eye Color Label -->
+        <TextView
+            android:id="@+id/eye_color_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/eye_color_label"
+            app:layout_constraintTop_toTopOf="@+id/hair_color_label"
+            app:layout_constraintRight_toRightOf="@+id/guideline"
+            android:layout_marginTop="22dp"
+            android:layout_marginRight="16dp"
+            tools:text="Eye Color:"/>
+
+        <!-- Eye color value -->
+        <TextView
+            android:id="@+id/eye_color_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@+id/eye_color_label"
+            app:layout_constraintLeft_toRightOf="@+id/guideline"
+            android:layout_marginLeft="16dp"
+            tools:text="Brown"
+            android:textStyle="bold"/>
+
+        <!-- Height Label -->
+        <TextView
+            android:id="@+id/height_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/height_label"
+            app:layout_constraintTop_toTopOf="@+id/eye_color_label"
+            app:layout_constraintRight_toRightOf="@+id/guideline"
+            android:layout_marginTop="22dp"
+            android:layout_marginRight="16dp"
+            tools:text="Height:"/>
+
+        <!-- Height value -->
+        <TextView
+            android:id="@+id/height_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@+id/height_label"
+            app:layout_constraintLeft_toRightOf="@+id/guideline"
+            android:layout_marginLeft="16dp"
+            tools:text="2'0&quot;"
+            android:textStyle="bold"/>
+
+        <!-- Weight Label -->
+        <TextView
+            android:id="@+id/weight_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/weight_label"
+            app:layout_constraintTop_toTopOf="@+id/height_label"
+            app:layout_constraintRight_toRightOf="@+id/guideline"
+            android:layout_marginTop="22dp"
+            android:layout_marginRight="16dp"
+            tools:text="Weight:"/>
+
+        <!-- Weight value -->
+        <TextView
+            android:id="@+id/weight_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@+id/weight_label"
+            app:layout_constraintLeft_toRightOf="@+id/guideline"
+            android:layout_marginLeft="16dp"
+            tools:text="30 lbs"
+            android:textStyle="bold"/>
 
     </android.support.constraint.ConstraintLayout>
 
