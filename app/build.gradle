@@ -20,6 +20,10 @@ android {
     dataBinding.enabled = true
 }
 
+ext {
+    archRoomVersion = "1.1.0-beta2"
+}
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:27.1.0'
@@ -31,8 +35,8 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     // Room
-    implementation 'android.arch.persistence.room:runtime:1.0.0'
-    annotationProcessor 'android.arch.persistence.room:compiler:1.0.0'
-    testImplementation 'android.arch.persistence.room:testing:1.0.0'
+    implementation "android.arch.persistence.room:runtime:$archRoomVersion"
+    annotationProcessor "android.arch.persistence.room:compiler:$archRoomVersion"
+    testImplementation "android.arch.persistence.room:testing:$archRoomVersion"
 
 }
