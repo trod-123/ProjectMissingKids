@@ -66,6 +66,14 @@ public class DataParsingUtils {
 
     private static DateFormat formatter = new SimpleDateFormat("MMM dd, yyyy hh:mm:ss a");
 
+    /**
+     * Converts a JSONArray of child data returned by NetworkUtils.getSearchResultsDataJsonArray()
+     * into a List of ChildData objects.
+     *
+     * @param dataJson a JSONArray of child data
+     * @return a List of ChildData objects parsed from the JSONArray
+     * @throws JSONException if there was a problem parsing the data
+     */
     public static List<ChildData> getChildDataListFromJsonArray(JSONArray dataJson)
             throws JSONException {
         ArrayList<ChildData> dataList = new ArrayList<>(dataJson.length());
@@ -76,6 +84,12 @@ public class DataParsingUtils {
         return dataList;
     }
 
+    /**
+     * Parses a single JSONObject of child data from a search into a ChildData object.
+     * @param childJson the JSONObject to be parsed
+     * @return the resulting ChildData object
+     * @throws JSONException if there was a problem parsing the data
+     */
     public static ChildData parseChildDataFromJson(JSONObject childJson) throws JSONException {
         String caseNumber = childJson.getString(CASE_NUMBER);
         String orgPrefix = childJson.getString(ORG_PREFIX);
@@ -113,8 +127,16 @@ public class DataParsingUtils {
                 hasPoster, thumbnailUrl, caseType, posterTitle, race);
     }
 
+    /**
+     * Parses the detail data for a child and adds it to the ChildData object for that child
+     * @param childJson the JSONObject containing the detail data to be parsed
+     * @param childData the ChildData object to add the detail data to
+     * @return the ChildData with the added detail data
+     * @throws JSONException if there was a problem parsing the data
+     */
     public static ChildData parseDetailDataForChild(JSONObject childJson, ChildData childData)
             throws JSONException {
+        // TODO check to see if the detail data is for the same case number as the ChildData
         boolean hasAgedPhoto = childJson.getBoolean(HAS_AGED_PHOTO);
         boolean hasExtraPhoto = childJson.getBoolean(HAS_EXTRA_PHOTO);
         String possibleLocation = childJson.getString(POSSIBLE_LOCATION);

@@ -53,8 +53,14 @@ public class NetworkUtils {
     private static final String TOTAL_PAGES = "totalPages";
     private static final String PERSONS = "persons";
 
+    // whether or not we have initialized the cookie manager for use in JSON format searches
     private static boolean sInitialized = false;
 
+    /**
+     * Builds the URL for starting a JSON format search. Used by getSearchResultsJsonArray().
+     *
+     * @return the URL to be used.
+     */
     public static URL buildJsonDataBeginSearchUrl() {
         Uri jsonUri = Uri.parse(BASE_URL).buildUpon()
                 .appendPath(JSON_PATH)
@@ -66,6 +72,13 @@ public class NetworkUtils {
         return convertUriToURL(jsonUri);
     }
 
+    /**
+     * Builds a URL for a particular page of JSON format search data. Used by
+     * getSearchResultsDataJsonArray().
+     *
+     * @param pageNumber the page number in the results.
+     * @return the URL to be used.
+     */
     public static URL buildJsonDataSearchPageUrl(int pageNumber) {
         Uri jsonUri = Uri.parse(BASE_URL).buildUpon()
                 .appendPath(JSON_PATH)
@@ -76,6 +89,13 @@ public class NetworkUtils {
         return convertUriToURL(jsonUri);
     }
 
+    /**
+     * Builds a URL for getting child detail data in JSON format.
+     *
+     * @param caseNumber the case number to get detail information about.
+     * @param orgPrefix the organization prefix for the case (e.g. "NCMC").
+     * @return the URL to use.
+     */
     public static URL buildJsonDataDetailUrl(int caseNumber, String orgPrefix) {
         Uri jsonUri = Uri.parse(BASE_URL).buildUpon()
                 .appendPath(JSON_PATH)
@@ -86,6 +106,11 @@ public class NetworkUtils {
         return convertUriToURL(jsonUri);
     }
 
+    /**
+     * Builds a URL for getting search results in HTML format.
+     *
+     * @return the URL to be used.
+     */
     public static URL buildHtmlDataUrl() {
         Uri htmlUri = Uri.parse(BASE_URL).buildUpon()
                 .appendPath(HTML_PATH)
@@ -95,6 +120,12 @@ public class NetworkUtils {
         return convertUriToURL(htmlUri);
     }
 
+    /**
+     * Utility method to convert Uris to URLs for use in getResponseFromHttpUrl().
+     *
+     * @param uri
+     * @return URL.
+     */
     private static URL convertUriToURL(Uri uri) {
         try {
             URL url = new URL(uri.toString());
@@ -106,6 +137,14 @@ public class NetworkUtils {
         }
     }
 
+    /**
+     * Gets all the search results in JSONArray format (array of JSONObjects).
+     * Loops through all the result pages and combines all results into one JSONArray
+     * that is suitable for parsing into ChildData.
+     *
+     * @return a JSONArray of child data JSONObjects.
+     * @throws JSONException
+     */
     public static JSONArray getSearchResultsDataJsonArray() throws JSONException {
         URL beginSearchURL = buildJsonDataBeginSearchUrl();
         try {
