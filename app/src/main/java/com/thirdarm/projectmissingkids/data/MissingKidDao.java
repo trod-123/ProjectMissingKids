@@ -20,7 +20,7 @@ import java.util.List;
 public interface MissingKidDao {
 
     /**
-     *  TODO: Implement LiveData observable query methods for returning data to your UI that would automatically update when the data changes in the database
+     *  TODO: Confirm LiveData implementation. These are basically observable query methods for returning data to your UI that would automatically update when the data changes in the database
      */
 
     /**
@@ -35,7 +35,7 @@ public interface MissingKidDao {
      * @return List of all MissingKids
      */
     @Query("SELECT * FROM kids")
-    List<MissingKid> loadAllKids();
+    LiveData<List<MissingKid>> loadAllKids();
 
     /**
      * Gets all the MissingKids currently in the database
@@ -43,7 +43,7 @@ public interface MissingKidDao {
      * @return List of all MissingKids
      */
     @Query("SELECT * FROM kids")
-    Cursor loadAllKidsCursor();
+    LiveData<Cursor> loadAllKidsCursor();
 
     /**
      * Gets the MissingKid with the provided NCMC id
@@ -52,7 +52,7 @@ public interface MissingKidDao {
      * @return The MissingKid associated with the NCMC id
      */
     @Query("SELECT * FROM kids WHERE ncmc_id IS :ncmcId")
-    MissingKid findKidByNcmcId(long ncmcId);
+    LiveData<MissingKid> findKidByNcmcId(long ncmcId);
 
     /**
      * Gets the MissingKid with the provided NCMC id
@@ -61,7 +61,7 @@ public interface MissingKidDao {
      * @return The MissingKid associated with the NCMC id
      */
     @Query("SELECT * FROM kids WHERE ncmc_id IS :ncmcId")
-    Cursor findKidByNcmcIdCursor(long ncmcId);
+    LiveData<Cursor> findKidByNcmcIdCursor(long ncmcId);
 
     /**
      * Gets all the MissingKids with the provided array of NCMC ids (NCMC ids must be unique)
@@ -70,7 +70,7 @@ public interface MissingKidDao {
      * @return The MissingKids associated with the NCMC ids
      */
     @Query("SELECT * FROM kids WHERE ncmc_id IN (:ncmcIds)")
-    List<MissingKid> loadAllKidsByNcmcIds(List<Long> ncmcIds);
+    LiveData<List<MissingKid>> loadAllKidsByNcmcIds(List<Long> ncmcIds);
 
     /**
      * Gets all the MissingKids with the provided array of NCMC ids (NCMC ids must be unique)
@@ -79,7 +79,7 @@ public interface MissingKidDao {
      * @return The MissingKids associated with the NCMC ids
      */
     @Query("SELECT * FROM kids WHERE ncmc_id IN (:ncmcIds)")
-    Cursor loadAllKidsByNcmcIdsCursor(List<Long> ncmcIds);
+    LiveData<Cursor> loadAllKidsByNcmcIdsCursor(List<Long> ncmcIds);
 
     /**
      * Gets the MissingKid with the provided names
@@ -90,7 +90,7 @@ public interface MissingKidDao {
      */
     @Query("SELECT * FROM kids WHERE first_name LIKE :first AND " +
             "last_name LIKE :last LIMIT 1")
-    MissingKid findKidByName(String first, String last);
+    LiveData<MissingKid> findKidByName(String first, String last);
 
     /**
      * Gets the MissingKid with the provided names
@@ -101,7 +101,7 @@ public interface MissingKidDao {
      */
     @Query("SELECT * FROM kids WHERE first_name LIKE :first AND " +
             "last_name LIKE :last LIMIT 1")
-    Cursor findKidByNameCursor(String first, String last);
+    LiveData<Cursor> findKidByNameCursor(String first, String last);
 
     /**
      * Searches for MissingKids with the provided name
@@ -111,7 +111,7 @@ public interface MissingKidDao {
      */
     @Query("SELECT * FROM kids WHERE first_name LIKE :search " +
             "OR last_name LIKE :search")
-    List<MissingKid> findAllKidsByName(String search);
+    LiveData<List<MissingKid>> findAllKidsByName(String search);
 
     /**
      * Searches for MissingKids with the provided name
@@ -121,7 +121,7 @@ public interface MissingKidDao {
      */
     @Query("SELECT * FROM kids WHERE first_name LIKE :search " +
             "OR last_name LIKE :search")
-    Cursor findAllKidsByNameCursor(String search);
+    LiveData<Cursor> findAllKidsByNameCursor(String search);
 
     /**
      * Searches for MissingKids that are older than the provided age
@@ -130,7 +130,7 @@ public interface MissingKidDao {
      * @return The MissingKids who are older than the provided age
      */
     @Query("SELECT * FROM kids WHERE age > :minAge")
-    List<MissingKid> findAllKidsOlderThanAge(int minAge);
+    LiveData<List<MissingKid>> findAllKidsOlderThanAge(int minAge);
 
     /**
      * Searches for MissingKids that are older than the provided age
@@ -139,7 +139,7 @@ public interface MissingKidDao {
      * @return The MissingKids who are older than the provided age
      */
     @Query("SELECT * FROM kids WHERE age > :minAge")
-    Cursor findAllKidsOlderThanAgeCursor(int minAge);
+    LiveData<Cursor> findAllKidsOlderThanAgeCursor(int minAge);
 
     /**
      *  Searches for MissingKids that are younger than the provided age
@@ -148,7 +148,7 @@ public interface MissingKidDao {
      * @return The MissingKids who are younger than the provided age
      */
     @Query("SELECT * FROM kids WHERE age < :maxAge")
-    List<MissingKid> findAllKidsYoungerThanAge(int maxAge);
+    LiveData<List<MissingKid>> findAllKidsYoungerThanAge(int maxAge);
 
     /**
      *  Searches for MissingKids that are younger than the provided age
@@ -157,7 +157,7 @@ public interface MissingKidDao {
      * @return The MissingKids who are younger than the provided age
      */
     @Query("SELECT * FROM kids WHERE age < :maxAge")
-    Cursor findAllKidsYoungerThanAgeCursor(int maxAge);
+    LiveData<Cursor> findAllKidsYoungerThanAgeCursor(int maxAge);
 
     /**
      *  Searches for MissingKids that are between the provided age range
@@ -167,7 +167,7 @@ public interface MissingKidDao {
      * @return The MissingKids whose ages are between the provided age range
      */
     @Query("SELECT * FROM kids WHERE age BETWEEN :minAge AND :maxAge")
-    List<MissingKid> findAllKidsBetweenAges(int minAge, int maxAge);
+    LiveData<List<MissingKid>> findAllKidsBetweenAges(int minAge, int maxAge);
 
     /**
      *  Searches for MissingKids that are between the provided age range
@@ -177,7 +177,7 @@ public interface MissingKidDao {
      * @return The MissingKids whose ages are between the provided age range
      */
     @Query("SELECT * FROM kids WHERE age BETWEEN :minAge AND :maxAge")
-    Cursor findAllKidsBetweenAgesCursor(int minAge, int maxAge);
+    LiveData<Cursor> findAllKidsBetweenAgesCursor(int minAge, int maxAge);
 
     /**
      *  Searches for MissingKids that are last seen or found in any of the provided list of cities
@@ -185,7 +185,7 @@ public interface MissingKidDao {
      * @return The MissingKids who are last seen or found in the provided list of cities
      */
     @Query("SELECT * FROM kids WHERE loc_city IN (:cities)")
-    List<MissingKid> findAllKidsFromCities(List<String> cities);
+    LiveData<List<MissingKid>> findAllKidsFromCities(List<String> cities);
 
     /**
      *  Searches for MissingKids that are last seen or found in any of the provided list of cities
@@ -193,7 +193,7 @@ public interface MissingKidDao {
      * @return The MissingKids who are last seen or found in the provided list of cities
      */
     @Query("SELECT * FROM kids WHERE loc_city IN (:cities)")
-    Cursor findAllKidsFromCitiesCursor(List<String> cities);
+    LiveData<Cursor> findAllKidsFromCitiesCursor(List<String> cities);
 
     /**
      *  Searches for MissingKids that are last seen or found in any of the provided list of states. States must be formatted using the ANSI 2-letter abbreviation standard.
@@ -201,7 +201,7 @@ public interface MissingKidDao {
      * @return The MissingKids who are last seen or found in the provided list of states
      */
     @Query("SELECT * FROM kids WHERE loc_state IN (:states)")
-    List<MissingKid> findAllKidsFromStates(List<String> states);
+    LiveData<List<MissingKid>> findAllKidsFromStates(List<String> states);
 
     /**
      *  Searches for MissingKids that are last seen or found in any of the provided list of states. States must be formatted using the ANSI 2-letter abbreviation standard.
@@ -209,7 +209,7 @@ public interface MissingKidDao {
      * @return The MissingKids who are last seen or found in the provided list of states
      */
     @Query("SELECT * FROM kids WHERE loc_state IN (:states)")
-    Cursor findAllKidsFromStatesCursor(List<String> states);
+    LiveData<Cursor> findAllKidsFromStatesCursor(List<String> states);
 
     /**
      *  Searches for MissingKids that are last seen or found in any of the provided list of countries. Countries must be formatted using the 2-letter country code, based on ISO 3166-1 alpha-2 standard.
@@ -217,7 +217,7 @@ public interface MissingKidDao {
      * @return The MissingKids who are last seen or found in the provided list of countries
      */
     @Query("SELECT * FROM kids WHERE loc_country IN (:countries)")
-    List<MissingKid> findAllKidsFromCountries(List<String> countries);
+    LiveData<List<MissingKid>> findAllKidsFromCountries(List<String> countries);
 
     /**
      *  Searches for MissingKids that are last seen or found in any of the provided list of countries. Countries must be formatted using the 2-letter country code, based on ISO 3166-1 alpha-2 standard.
@@ -225,7 +225,7 @@ public interface MissingKidDao {
      * @return The MissingKids who are last seen or found in the provided list of countries
      */
     @Query("SELECT * FROM kids WHERE loc_country IN (:countries)")
-    Cursor findAllKidsFromCountriesCursor(List<String> countries);
+    LiveData<Cursor> findAllKidsFromCountriesCursor(List<String> countries);
 
     // </editor-fold>
 
@@ -292,6 +292,13 @@ public interface MissingKidDao {
      */
     @Delete
     int deleteSingleKid(MissingKid kid);
+
+    /**
+     * Delete all the kids from the database
+     * @return The number of rows removed from the database
+     */
+    @Query("DELETE FROM kids")
+    int deleteAll();
 
     // </editor-fold>
 }
