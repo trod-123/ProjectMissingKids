@@ -9,8 +9,13 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ProgressBar;
 
+import com.thirdarm.projectmissingkids.data.MissingKidsDatabase;
+import com.thirdarm.projectmissingkids.util.FakeDatabaseInitializer;
+
 public class MainActivity extends AppCompatActivity implements KidsAdapter.KidsAdapterOnClickHandler {
 
+    // For keeping reference to db
+    MissingKidsDatabase mDb;
 
     private KidsAdapter mKidsAdapter;
     private RecyclerView mRecyclerView;
@@ -41,6 +46,19 @@ public class MainActivity extends AppCompatActivity implements KidsAdapter.KidsA
 
         showLoading();
 
+        // set up the database with fake data
+        initializeDatabase();
+
+    }
+
+    /**
+     * Initialize the database then fill it with fake data
+     */
+    private void initializeDatabase() {
+        mDb = MissingKidsDatabase.getMissingKidsDatabase(this);
+        FakeDatabaseInitializer.populateAsync(mDb);
+
+        // TODO: Use cursor loader to read data from database
     }
 
     @Override
