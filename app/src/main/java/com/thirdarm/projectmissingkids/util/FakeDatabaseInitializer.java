@@ -25,6 +25,7 @@ public class FakeDatabaseInitializer {
 
     /**
      * Populates the database via an AsyncTask, with a simulated delay provided by DELAY_MILLIS for internet fetches
+     *
      * @param db The MissingKidsDatabase to populate
      */
     public static void populateAsync(final MissingKidsDatabase db) {
@@ -34,6 +35,7 @@ public class FakeDatabaseInitializer {
 
     /**
      * Helper method that inserts fake data in the database. Must be run outside of the main thread since it provides a simulated delay for internet fetches
+     *
      * @param db The MissingKidsDatabase to populate
      */
     private static void populateWithFakeData(MissingKidsDatabase db) {
@@ -53,7 +55,7 @@ public class FakeDatabaseInitializer {
         int[] estimatedAgeUppers = new int[]{-1, -1, 21, -1, -1, -1, -1, -1};
         String[] races = new String[]{"White", "Hispanic", "Unknown", "Hispanic", "Hispanic", "Biracial", "Hispanic", "Am. Ind."};
         String[] cities = new String[]{"San Ramon", "Van Nuys", "Los Angeles", "Los Angeles", "Van Nuys", "Wilmington", "Wilmington", "Oceanside"};
-        String[] states = new String[]{"CA","CA","CA","CA","CA","CA","CA","CA"};
+        String[] states = new String[]{"CA", "CA", "CA", "CA", "CA", "CA", "CA", "CA"};
         String[] countries = new String[]{"US", "US", "US", "US", "US", "US", "US", "US"};
         String[] sources = new String[]{"National Center for Missing & Exploited Children", "National Center for Missing & Exploited Children", "National Center for Missing & Exploited Children", "National Center for Missing & Exploited Children", "National Center for Missing & Exploited Children", "National Center for Missing & Exploited Children", "National Center for Missing & Exploited Children", "National Center for Missing & Exploited Children"};
 
@@ -72,45 +74,49 @@ public class FakeDatabaseInitializer {
 
         String[] originalPhotoUrls = new String[]{"http://api.missingkids.org/photographs/NCMC982012c1.jpg", "http://api.missingkids.org/photographs/NCMC1180655c1.jpg", "http://api.missingkids.org/photographs/NCMC1318681c1.jpg", "http://api.missingkids.org/photographs/NCMC1275372c1.jpg", "http://api.missingkids.org/photographs/NCMC780684c1.jpg", "http://api.missingkids.org/photographs/NCMC1276912c1.jpg", "http://api.missingkids.org/photographs/NCMC1317601c1.jpg", "http://api.missingkids.org/photographs/NCMC1316322c1.jpg"};
 
-        String[] additionalPhotoUrls = new String[]{"http://api.missingkids.org/photographs/NCMC982012e1.jpg", "http://api.missingkids.org/photographs/NCMC1180655e1.jpg", "", "", "http://api.missingkids.org/photographs/NCMC780684e1.jpg","", "http://api.missingkids.org/photographs/NCMC1317601x1.jpg", "http://api.missingkids.org/photographs/NCMC1316322x1.jpg"};
+        String[] additionalPhotoUrls = new String[]{"http://api.missingkids.org/photographs/NCMC982012e1.jpg", "http://api.missingkids.org/photographs/NCMC1180655e1.jpg", "", "", "http://api.missingkids.org/photographs/NCMC780684e1.jpg", "", "http://api.missingkids.org/photographs/NCMC1317601x1.jpg", "http://api.missingkids.org/photographs/NCMC1316322x1.jpg"};
 
+        for (int i = 0; i < firstNames.length; i++) {
+            MissingKid kid = new MissingKid();
+            kid.name = new Name();
+            kid.name.firstName = firstNames[i];
+            kid.name.middleName = middleNames[i];
+            kid.name.lastName = lastNames[i];
+            kid.address = new Address();
+            kid.address.locCity = cities[i];
+            kid.address.locState = states[i];
+            kid.address.locCountry = countries[i];
+            kid.date = new Date();
+            kid.date.age = ages[i]; // if age not available, stored as -1
+            kid.date.estAgeLower = estimatedAgeLowers[i]; // if age not available, stored as -1
+            kid.date.estAgeHigher = estimatedAgeUppers[i]; // if age not available, stored as -1
+            kid.date.dateMissing = dateMissing[i];
+            kid.date.dateOfBirth = dateOfBirth[i];
+            kid.description = descriptions[i];
+            kid.eyeColor = eyeColors[i];
+            kid.hairColor = hairColors[i];
+            kid.gender = genders[i];
+            kid.race = races[i];
+            kid.height = new Height();
+            kid.height.heightImperial = heights[i]; // if height not available, stored as -1
+            kid.height.estHeightImperialLower = estimatedHeightLowers[i]; // if height not available, stored as -1
+            kid.height.estHeightImperialHigher = estimatedHeightUppers[i]; // if height not available, stored as -1
+            kid.weight = new Weight();
+            kid.weight.weightImperial = weights[i]; // if weight not available, stored as -1
+            kid.ncmcId = ncmcIds[i];
+            kid.posterUrl = "http://api.missingkids.org/poster/NCMC/" + ncmcIds[i];
+            kid.originalPhotoUrl = originalPhotoUrls[i];
+            kid.source = sources[i];
+            kid.status = statuses[i];
+
+            kids.add(kid);
+            Log.d(TAG, "Added one kid to list");
+        }
         try {
-            for (int i = 0; i < firstNames.length; i++) {
-                MissingKid kid = new MissingKid();
-                kid.name = new Name();
-                kid.name.firstName = firstNames[i];
-                kid.name.middleName = middleNames[i];
-                kid.name.lastName = lastNames[i];
-                kid.address = new Address();
-                kid.address.locCity = cities[i];
-                kid.address.locState = states[i];
-                kid.address.locCountry = countries[i];
-                kid.date = new Date();
-                kid.date.age = ages[i]; // if age not available, stored as -1
-                kid.date.estAgeLower = estimatedAgeLowers[i]; // if age not available, stored as -1
-                kid.date.estAgeHigher = estimatedAgeUppers[i]; // if age not available, stored as -1
-                kid.date.dateMissing = dateMissing[i];
-                kid.date.dateOfBirth = dateOfBirth[i];
-                kid.description = descriptions[i];
-                kid.eyeColor = eyeColors[i];
-                kid.hairColor = hairColors[i];
-                kid.gender = genders[i];
-                kid.race = races[i];
-                kid.height = new Height();
-                kid.height.heightImperial = heights[i]; // if height not available, stored as -1
-                kid.height.estHeightImperialLower = estimatedHeightLowers[i]; // if height not available, stored as -1
-                kid.height.estHeightImperialHigher = estimatedHeightUppers[i]; // if height not available, stored as -1
-                kid.weight = new Weight();
-                kid.weight.weightImperial = weights[i]; // if weight not available, stored as -1
-                kid.ncmcId = ncmcIds[i];
-                kid.posterUrl = "http://api.missingkids.org/poster/NCMC/" + ncmcIds[i];
-                kid.originalPhotoUrl = originalPhotoUrls[i];
-                kid.source = sources[i];
-                kid.status = statuses[i];
-
-                kids.add(kid);
+            for (MissingKid kid : kids) {
+                long rowId = db.missingKidDao().insertSingleKid(kid);
                 Thread.sleep(DELAY_MILLIS);
-                Log.d(TAG, "Added one kid to db");
+                Log.d(TAG, "Added one kid to db at row: " + rowId);
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
