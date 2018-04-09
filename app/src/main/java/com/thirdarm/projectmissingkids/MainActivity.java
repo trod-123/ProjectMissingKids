@@ -14,13 +14,15 @@ import android.widget.ProgressBar;
 import com.thirdarm.projectmissingkids.data.MissingKid;
 import com.thirdarm.projectmissingkids.data.MissingKidDao;
 import com.thirdarm.projectmissingkids.data.MissingKidsDatabase;
+import com.thirdarm.projectmissingkids.util.DatabaseInitializer;
 import com.thirdarm.projectmissingkids.util.FakeDatabaseInitializer;
 
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements
         KidsAdapter.KidsAdapterOnClickHandler,
-        FakeDatabaseInitializer.OnDbPopulationFinishedListener {
+        FakeDatabaseInitializer.OnDbPopulationFinishedListener,
+        DatabaseInitializer.OnDbPopulationFinishedListener {
 
     // For keeping reference to db
     MissingKidsDatabase mDb;
@@ -62,8 +64,9 @@ public class MainActivity extends AppCompatActivity implements
 
         showLoading();
 
-        // set up the database with fake data
-        initializeDatabase();
+        // set up the database
+        mDb = MissingKidsDatabase.getMissingKidsDatabase(this);
+        DatabaseInitializer.initializeDbWithOnlineData(mDb, this);
 
     }
 
@@ -112,6 +115,7 @@ public class MainActivity extends AppCompatActivity implements
         (new MissingKidsFetchTask(mDb)).execute();
     }
 
+
     private class MissingKidsFetchTask extends AsyncTask<Void, Void, List<MissingKid>> {
         MissingKidDao dao;
 
@@ -131,8 +135,5 @@ public class MainActivity extends AppCompatActivity implements
             mKidsAdapter.swapList(missingKids);
             showView();
         }
-
     }
-
-
 }
