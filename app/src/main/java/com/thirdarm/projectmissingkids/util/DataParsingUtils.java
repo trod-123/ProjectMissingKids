@@ -1,5 +1,7 @@
 package com.thirdarm.projectmissingkids.util;
 
+import android.util.Log;
+
 import com.thirdarm.projectmissingkids.data.ChildData;
 
 import org.json.JSONArray;
@@ -17,6 +19,9 @@ import java.util.List;
  * Created by sobelman on 4/6/2018.
  */
 public class DataParsingUtils {
+
+    private static final String TAG = DataParsingUtils.class.getSimpleName();
+
     // JSON field names
     private static final String CASE_NUMBER = "caseNumber";
     private static final String ORG_PREFIX = "orgPrefix";
@@ -25,7 +30,7 @@ public class DataParsingUtils {
     private static final String SEQ_NUMBER = "seqNumber";
     private static final String LANG_ID = "langId";
     private static final String FIRST_NAME = "firstName";
-    private static final String LAST_NAME = "lastNaem";
+    private static final String LAST_NAME = "lastName";
     private static final String MIDDLE_NAME = "middleName";
     private static final String MISSING_CITY = "missingCity";
     private static final String MISSING_COUNTY = "missingCounty";
@@ -92,6 +97,7 @@ public class DataParsingUtils {
      */
     public static ChildData parseChildDataFromJson(JSONObject childJson) throws JSONException {
         String caseNumber = childJson.getString(CASE_NUMBER);
+        //Log.d(TAG, "Case number: " + caseNumber);
         String orgPrefix = childJson.getString(ORG_PREFIX);
         String orgName = childJson.getString(ORG_NAME);
         boolean isChild = childJson.getBoolean(IS_CHILD);
@@ -104,7 +110,8 @@ public class DataParsingUtils {
         String missingCounty = childJson.getString(MISSING_COUNTY);
         String missingState = childJson.getString(MISSING_STATE);
         String missingCountry = childJson.getString(MISSING_COUNTRY);
-        String missingDateStr = childJson.getString(MISSING_DATE);
+        //String missingDateStr = childJson.getString(MISSING_DATE); // TODO: Fix this
+        String missingDateStr = "Aug 26, 1980 12:00:00 AM"; // TODO: Remove this once above is fixed
         Date missingDate = null;
         try {
             missingDate = formatter.parse(missingDateStr);
