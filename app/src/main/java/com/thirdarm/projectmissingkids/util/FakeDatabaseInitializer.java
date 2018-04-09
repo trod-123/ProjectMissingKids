@@ -1,6 +1,7 @@
 package com.thirdarm.projectmissingkids.util;
 
 import android.os.AsyncTask;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.thirdarm.projectmissingkids.data.Address;
@@ -21,26 +22,23 @@ public class FakeDatabaseInitializer {
 
     private static final String TAG = FakeDatabaseInitializer.class.getSimpleName();
 
-    private static final int DELAY_MILLIS = 500;
+    private static final int DELAY_MILLIS = 0;
 
     /**
      * Populates the database via an AsyncTask, with a simulated delay provided by DELAY_MILLIS for internet fetches
      *
      * @param db The MissingKidsDatabase to populate
      */
-    public static void populateAsync(final MissingKidsDatabase db) {
-        PopulateDbAsync task = new PopulateDbAsync(db);
+    public static void populateAsync(MissingKidsDatabase db, OnDbPopulationFinishedListener listener) {
+        PopulateDbAsync task = new PopulateDbAsync(db, listener);
         task.execute();
     }
 
-    /**
-     * Helper method that inserts fake data in the database. Must be run outside of the main thread since it provides a simulated delay for internet fetches
-     *
-     * @param db The MissingKidsDatabase to populate
-     */
-    private static void populateWithFakeData(MissingKidsDatabase db) {
-        int numRows = db.missingKidDao().deleteAll();
-        Log.d(TAG, "Number of rows deleted from db: " + numRows);
+    public static void populateSync(@NonNull final MissingKidsDatabase db) {
+        populateWithFakeData(db, getFakeKids());
+    }
+
+    public static List<MissingKid> getFakeKids() {
 
         List<MissingKid> kids = new ArrayList<>();
 
@@ -112,6 +110,27 @@ public class FakeDatabaseInitializer {
             kids.add(kid);
             Log.d(TAG, "Added one kid to list");
         }
+        return kids;
+    }
+
+    /**
+     * Helper method to delete all data currently in the database
+     * @param db
+     * @return
+     */
+    public static int deleteAllData(MissingKidsDatabase db) {
+        int numRows = db.missingKidDao().deleteAll();
+        Log.d(TAG, "Number of rows deleted from db: " + numRows);
+
+        return numRows;
+    }
+
+    /**
+     * Helper method that inserts fake data in the database. Must be run outside of the main thread since it provides a simulated delay for internet fetches
+     *
+     * @param db The MissingKidsDatabase to populate
+     */
+    private static void populateWithFakeData(MissingKidsDatabase db, List<MissingKid> kids) {
         try {
             for (MissingKid kid : kids) {
                 long rowId = db.missingKidDao().insertSingleKid(kid);
@@ -123,20 +142,31 @@ public class FakeDatabaseInitializer {
         }
     }
 
+    public interface OnDbPopulationFinishedListener {
+        void onFinishedLoading();
+    }
+
     /**
      * AsyncTask to populate the db with fake MissingKid data
      */
     private static class PopulateDbAsync extends AsyncTask<Void, Void, Void> {
         private final MissingKidsDatabase mDb;
+        private OnDbPopulationFinishedListener mListener;
 
-        PopulateDbAsync(MissingKidsDatabase db) {
+        PopulateDbAsync(MissingKidsDatabase db, OnDbPopulationFinishedListener listener) {
             mDb = db;
+            mListener = listener;
         }
 
         @Override
         protected Void doInBackground(final Void... params) {
-            populateWithFakeData(mDb);
+            populateWithFakeData(mDb, getFakeKids());
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            mListener.onFinishedLoading();
         }
     }
 

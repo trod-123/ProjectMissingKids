@@ -2,6 +2,7 @@ package com.thirdarm.projectmissingkids;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -9,10 +10,15 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ProgressBar;
 
+import com.thirdarm.projectmissingkids.data.MissingKid;
+import com.thirdarm.projectmissingkids.data.MissingKidDao;
 import com.thirdarm.projectmissingkids.data.MissingKidsDatabase;
 import com.thirdarm.projectmissingkids.util.FakeDatabaseInitializer;
 
-public class MainActivity extends AppCompatActivity implements KidsAdapter.KidsAdapterOnClickHandler {
+import java.util.List;
+
+public class MainActivity extends AppCompatActivity implements
+        KidsAdapter.KidsAdapterOnClickHandler, FakeDatabaseInitializer.OnDbPopulationFinishedListener {
 
     // For keeping reference to db
     MissingKidsDatabase mDb;
@@ -56,10 +62,12 @@ public class MainActivity extends AppCompatActivity implements KidsAdapter.KidsA
      */
     private void initializeDatabase() {
         mDb = MissingKidsDatabase.getMissingKidsDatabase(this);
-        FakeDatabaseInitializer.populateAsync(mDb);
+        FakeDatabaseInitializer.populateAsync(mDb, this);
 
-        // TODO: Use cursor loader to read data from database
+        // TODO: AsyncTask will load data. See overridden onFinishedLoading() method below
     }
+
+
 
     @Override
     public void onClick(long id) {
@@ -83,4 +91,36 @@ public class MainActivity extends AppCompatActivity implements KidsAdapter.KidsA
         /* Finally, show the loading indicator */
         mLoadingIndicator.setVisibility(View.VISIBLE);
     }
+
+    @Override
+    public void onFinishedLoading() {
+        // TODO: this is called when FakeDatabaseInitializer.populateAsync() is complete
+        (new MissingKidsFetchTask(mDb)).execute();
+    }
+
+    private class MissingKidsFetchTask extends AsyncTask<Void, Void, List<MissingKid>> {
+        MissingKidDao dao;
+
+        public MissingKidsFetchTask(MissingKidsDatabase db) {
+            dao = db.missingKidDao();
+        }
+
+        @Override
+        protected List<MissingKid> doInBackground(Void... voids) {
+            return dao.loadAllKids();
+        }
+
+        @Override
+        protected void onPostExecute(List<MissingKid> missingKids) {
+            super.onPostExecute(missingKids);
+
+            // TODO: Swap empty list or cursor in RecyclerView
+//            mRecyclerView.swapList(missingKids);
+        }
+    }
+
+
+
+
+
 }
