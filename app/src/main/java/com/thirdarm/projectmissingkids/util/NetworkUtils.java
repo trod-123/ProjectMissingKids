@@ -188,6 +188,15 @@ public class NetworkUtils {
         }
     }
 
+    /**
+     * Retrieves child detail data for a particular case.
+     *
+     * @param caseNumber the case number of the child for whom detail data is being
+     *                   requested.
+     * @param orgPrefix the organization prefix for the organization the case belongs to.
+     * @return a JSONObject containing the detail data, suitable for parsing into ChildData.
+     * @throws JSONException if there was a problem parsing the server response.
+     */
     public static JSONObject getDetailDataJson(int caseNumber, String orgPrefix)
             throws JSONException {
         URL detailURL = buildJsonDataDetailUrl(caseNumber, orgPrefix);
