@@ -44,11 +44,14 @@ public class DatabaseInitializer {
      * @param db
      * @return
      */
-    public static int deleteAllData(MissingKidsDatabase db) {
-        int numRows = db.missingKidDao().deleteAll();
-        Log.d(TAG, "Number of rows deleted from db: " + numRows);
-
-        return numRows;
+    public static void deleteAllData(final MissingKidsDatabase db) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                int numRows = db.missingKidDao().deleteAll();
+                Log.d(TAG, "Number of rows deleted from db: " + numRows);
+            }
+        }).run();
     }
 
     /**
