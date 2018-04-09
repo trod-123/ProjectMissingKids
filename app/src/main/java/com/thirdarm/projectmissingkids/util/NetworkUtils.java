@@ -52,6 +52,7 @@ public class NetworkUtils {
     private static final String TOTAL_RECORDS = "totalRecords";
     private static final String TOTAL_PAGES = "totalPages";
     private static final String PERSONS = "persons";
+    private static final String CHILD_BEAN = "childBean";
 
     // whether or not we have initialized the cookie manager for use in JSON format searches
     private static boolean sInitialized = false;
@@ -181,6 +182,27 @@ public class NetworkUtils {
                         personsArray.length());
             }
             return personsArray;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static JSONObject getDetailDataJson(int caseNumber, String orgPrefix)
+            throws JSONException {
+        URL detailURL = buildJsonDataDetailUrl(caseNumber, orgPrefix);
+        try {
+            String responseStr =  getResponseFromHttpUrl(detailURL);
+            JSONObject responseJson = new JSONObject(responseStr);
+            String status = responseJson.optString("status");
+            if ("success".equals(status)) {
+                if (responseJson.has(CHILD_BEAN)) {
+                    return responseJson.getJSONObject(CHILD_BEAN);
+                } else {
+                    return null;
+                }
+            }
+            return null;
         } catch (IOException e) {
             e.printStackTrace();
             return null;
