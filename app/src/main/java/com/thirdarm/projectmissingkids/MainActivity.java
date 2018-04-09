@@ -13,6 +13,7 @@ import android.widget.ProgressBar;
 import com.thirdarm.projectmissingkids.data.MissingKid;
 import com.thirdarm.projectmissingkids.data.MissingKidDao;
 import com.thirdarm.projectmissingkids.data.MissingKidsDatabase;
+import com.thirdarm.projectmissingkids.util.DatabaseInitializer;
 import com.thirdarm.projectmissingkids.util.FakeDatabaseInitializer;
 
 import java.util.List;
