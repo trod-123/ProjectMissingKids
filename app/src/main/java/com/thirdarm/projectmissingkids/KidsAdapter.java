@@ -85,8 +85,12 @@ public class KidsAdapter extends RecyclerView.Adapter<KidsAdapter.KidsAdapterVie
         /*******
          * AGE *
          *******/
-        String age = Long.toString(kid.date.age);
-        holder.ageView.setText("Age: " + age);
+        if (kid.date.age > -1) {
+            String age = Long.toString(kid.date.age);
+            holder.ageView.setText("Age: " + age);
+        } else {
+            holder.ageView.setVisibility(View.INVISIBLE);
+        }
 
         /****************
          * MISSING DATE *
@@ -133,28 +137,41 @@ public class KidsAdapter extends RecyclerView.Adapter<KidsAdapter.KidsAdapterVie
         KidsAdapterViewHolder(View view) {
             super(view);
 
-            thumbnailView = (ImageView) view.findViewById(R.id.image_small);
+            thumbnailView = view.findViewById(R.id.image_small);
 
-            nameView = (TextView) view.findViewById(R.id.name);
-            idView = (TextView) view.findViewById(R.id.ncmc_id);
-            dobView = (TextView) view.findViewById(R.id.dob);
-            ageView = (TextView) view.findViewById(R.id.age);
-            missingDateView = (TextView) view.findViewById(R.id.missing_date);
-            raceView = (TextView) view.findViewById(R.id.race);
-            locationView = (TextView) view.findViewById(R.id.location);
+            nameView = view.findViewById(R.id.name);
+            idView = view.findViewById(R.id.ncmc_id);
+            dobView = view.findViewById(R.id.dob);
+            ageView = view.findViewById(R.id.age);
+            missingDateView = view.findViewById(R.id.missing_date);
+            raceView = view.findViewById(R.id.race);
+            locationView = view.findViewById(R.id.location);
 
             view.setOnClickListener(this);
         }
 
+        /**
+         * This gets called by the child views during a click.
+         * It will get the NCMC ID and pass it to onClick.
+         *
+         * @param view The View that was clicked
+         */
         @Override
         public void onClick(View view) {
             int adapterPosition = getAdapterPosition();
-//            mCursor.moveToPosition(adapterPosition);
-//            long idInLong = mCursor.getLong(MainActivity.INDEX_NCMC_ID);
-//            mClickHandler.onClick(idInLong);
+            MissingKid kid = kids.get(adapterPosition);
+            long ncmcId = kid.ncmcId;
+            mClickHandler.onClick(ncmcId);
         }
     }
 
+    /**
+     * This method is used to set the data on a KidsAdapter if we've already
+     * created one. This is handy when we get new data from the web but don't want to create a
+     * new KidsAdapter to display it.
+     *
+     * @param newKids The new list data to be displayed.
+     */
     void swapList(List<MissingKid> newKids) {
         kids = newKids;
         notifyDataSetChanged();

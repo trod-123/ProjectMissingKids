@@ -19,7 +19,8 @@ import com.thirdarm.projectmissingkids.util.FakeDatabaseInitializer;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements
-        KidsAdapter.KidsAdapterOnClickHandler, FakeDatabaseInitializer.OnDbPopulationFinishedListener {
+        KidsAdapter.KidsAdapterOnClickHandler,
+        FakeDatabaseInitializer.OnDbPopulationFinishedListener {
 
     // For keeping reference to db
     MissingKidsDatabase mDb;
@@ -30,6 +31,7 @@ public class MainActivity extends AppCompatActivity implements
     private ProgressBar mLoadingIndicator;
 
     public static final int INDEX_NCMC_ID = 123456;
+    public static final String NCMC = "NCMC ID";
 
     List<MissingKid> kids;
 
@@ -46,7 +48,7 @@ public class MainActivity extends AppCompatActivity implements
         LinearLayoutManager layoutManager =
                 new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
 
-        /** Divider between each item */
+        /* Divider between each item */
         RecyclerView.ItemDecoration mDivider =
                 new DividerItemDecoration(mRecyclerView.getContext(), layoutManager.getOrientation());
         mRecyclerView.addItemDecoration(mDivider);
@@ -76,12 +78,16 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
-
+    /**
+     * Get value for NCMC from the onClick
+     * and pass the NCMC id to the detailActivity
+     *
+     * @param id The NCMC id for the row that was clicked
+     */
     @Override
     public void onClick(long id) {
         Intent detailIntent = new Intent(MainActivity.this, DetailActivity.class);
-        // Get Uri for NCMC from MissingKidsContract
-        // and set the uri data to the Intent
+        detailIntent.putExtra(NCMC, id);
         startActivity(detailIntent);
     }
 
@@ -103,7 +109,6 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onFinishedLoading() {
         // TODO: this is called when FakeDatabaseInitializer.populateAsync() is complete
-        mKidsAdapter.swapList(kids);
         (new MissingKidsFetchTask(mDb)).execute();
     }
 
