@@ -52,7 +52,7 @@ public class DatabaseInitializer {
                 Log.d(TAG, "Number of rows deleted from db: " + numRows);
             }
         }).run();
-
+    }
 
     /**
      * Gets the JSONArray data from the network. Must be run on a background thread

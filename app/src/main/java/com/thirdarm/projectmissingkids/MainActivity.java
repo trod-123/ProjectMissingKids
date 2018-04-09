@@ -21,7 +21,6 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements
         KidsAdapter.KidsAdapterOnClickHandler,
-        FakeDatabaseInitializer.OnDbPopulationFinishedListener,
         DatabaseInitializer.OnDbPopulationFinishedListener {
 
     // For keeping reference to db
@@ -73,12 +72,12 @@ public class MainActivity extends AppCompatActivity implements
     /**
      * Initialize the database then fill it with fake data
      */
-    private void initializeDatabase() {
-        mDb = MissingKidsDatabase.getMissingKidsDatabase(this);
-        FakeDatabaseInitializer.populateAsync(mDb, this);
-
-        // TODO: AsyncTask will load data. See overridden onFinishedLoading() method below
-    }
+//    private void initializeDatabase() {
+//        mDb = MissingKidsDatabase.getMissingKidsDatabase(this);
+//        FakeDatabaseInitializer.populateAsync(mDb, this);
+//
+//        // TODO: AsyncTask will load data. See overridden onFinishedLoading() method below
+//    }
 
 
     /**

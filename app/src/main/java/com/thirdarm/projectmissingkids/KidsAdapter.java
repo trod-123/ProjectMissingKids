@@ -56,7 +56,8 @@ public class KidsAdapter extends RecyclerView.Adapter<KidsAdapter.KidsAdapterVie
         /****************
          * KID IMAGE    *
          ****************/
-        Picasso.get().load(kid.originalPhotoUrl).fit().into(holder.thumbnailView);
+        String picUrl = "http://api.missingkids.org" + kid.originalPhotoUrl;
+        Picasso.get().load(picUrl).fit().into(holder.thumbnailView);
 
         /********
          * NAME *
@@ -72,8 +73,7 @@ public class KidsAdapter extends RecyclerView.Adapter<KidsAdapter.KidsAdapterVie
         /******************
          * NCMC ID NUMBER *
          ******************/
-        String ncId = Long.toString(kid.ncmcId);
-        holder.idView.setText("NCMC" + ncId);
+        holder.idView.setText("NCMC" + kid.ncmcId);
 
         /*******
          * DOB *
@@ -160,7 +160,7 @@ public class KidsAdapter extends RecyclerView.Adapter<KidsAdapter.KidsAdapterVie
         public void onClick(View view) {
             int adapterPosition = getAdapterPosition();
             MissingKid kid = kids.get(adapterPosition);
-            long ncmcId = kid.ncmcId;
+            long ncmcId = Long.valueOf(kid.ncmcId);
             mClickHandler.onClick(ncmcId);
         }
     }
