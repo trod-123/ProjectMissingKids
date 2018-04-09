@@ -6,11 +6,11 @@ import android.database.Cursor;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.thirdarm.projectmissingkids.Utils.TestUtils;
+import com.thirdarm.projectmissingkids.util.TestUtils;
 import com.thirdarm.projectmissingkids.data.MissingKid;
 import com.thirdarm.projectmissingkids.data.MissingKidDao;
 import com.thirdarm.projectmissingkids.data.MissingKidsDatabase;
-import com.thirdarm.projectmissingkids.data.MissingKidsDatabase_Impl;
+import com.thirdarm.projectmissingkids.util.FakeDatabaseInitializer;
 
 import org.junit.After;
 import org.junit.Before;
@@ -18,11 +18,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
-import static android.support.test.espresso.matcher.ViewMatchers.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -40,6 +40,7 @@ public class MissingKidsDatabaseTest {
     @Before
     public void createDb() {
         Context context = InstrumentationRegistry.getTargetContext();
+        // this simulates database creation, so that we aren't creating any real database on the device
         mDb = Room.inMemoryDatabaseBuilder(context, MissingKidsDatabase.class).build();
         mMissingKidDao = mDb.missingKidDao();
     }
@@ -115,4 +116,56 @@ public class MissingKidsDatabaseTest {
             cursor.close();
         }
     }
+
+    @Test
+    public void testFakeDatabaseInitializer() throws Exception {
+        // delete database
+        FakeDatabaseInitializer.deleteAllData(mDb);
+
+        // populate the fake database
+        FakeDatabaseInitializer.populateSync(mDb);
+
+        List<MissingKid> kids = FakeDatabaseInitializer.getFakeKids();
+        List<String> firstNames = new ArrayList<>();
+        for (MissingKid kid : kids) {
+            String firstName = kid.name.firstName;
+            firstNames.add(firstName);
+        }
+
+        // query the database for missing kids
+        Cursor cursor = mMissingKidDao.loadAllKidsCursor();
+        cursor.moveToFirst();
+        do {
+            String firstName = cursor.getString(cursor.getColumnIndex("first_name"));
+            assertTrue(firstNames.contains(firstName));
+        } while (cursor.moveToNext());
+    }
+
+//    @Test
+//    public void writeMissingKidsToContentProviderAndReadInCursor() throws Exception {
+//        // delete database
+//        FakeDatabaseInitializer.deleteAllData(mDb);
+//
+//        // populate the fake database
+//        FakeDatabaseInitializer.populateSync(mDb);
+//
+//        List<MissingKid> kids = FakeDatabaseInitializer.getFakeKids();
+//        List<String> firstNames = new ArrayList<>();
+//        for (MissingKid kid : kids) {
+//            String firstName = kid.name.firstName;
+//            firstNames.add(firstName);
+//        }
+//        Context context = InstrumentationRegistry.getTargetContext();
+//        ContentResolver cr = context.getContentResolver();
+//
+//        // insert all the kids into the provider
+//
+//        // read all the kids
+//        Cursor cursor = cr.query(MissingKid.CONTENT_URI, null, null, null, null);
+//        cursor.moveToFirst();
+//        do {
+//            String firstName = cursor.getString(cursor.getColumnIndex("first_name"));
+//            assertTrue(firstNames.contains(firstName));
+//        } while (cursor.moveToNext());
+//    }
 }

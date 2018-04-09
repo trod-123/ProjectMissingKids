@@ -293,5 +293,12 @@ public interface MissingKidDao {
     @Delete
     int deleteSingleKid(MissingKid kid);
 
+    /**
+     * Delete all the kids from the database
+     * @return The number of rows removed from the database
+     */
+    @Query("DELETE FROM kids")
+    int deleteAll();
+
     // </editor-fold>
 }

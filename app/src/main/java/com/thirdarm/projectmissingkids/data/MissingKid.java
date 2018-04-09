@@ -5,11 +5,54 @@ import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 
+import com.thirdarm.projectmissingkids.util.GeneralUtils;
+import com.thirdarm.projectmissingkids.util.Tuple;
+
 /**
  * This entity represents a MissingKid table within the MissingKidsDatabase.  Contains all the "columns" of an SQLite database table
  */
 @Entity(tableName = "kids")
 public class MissingKid {
+
+    public static MissingKid convertFromPartialChildData(ChildData data) {
+        MissingKid kid = new MissingKid();
+        kid.ncmcId = data.getCaseNumber();
+        kid.source = data.getOrgName();
+        kid.originalPhotoUrl = data.getThumbnailURL();
+        kid.race = data.getRace();
+
+        // name
+        kid.name = new Name();
+        kid.name.firstName = data.getFirstName();
+        kid.name.middleName = data.getMiddleName();
+        kid.name.lastName = data.getLastName();
+
+        // address
+        kid.address = new Address();
+        kid.address.locCity = data.getMissingCity();
+        kid.address.locState = data.getMissingState();
+        kid.address.locCountry = data.getMissingCountry();
+
+        kid.date = new Date();
+        kid.date.age = data.getAge();
+
+        // Approx age (ChildData regex: "lower-upper" e.g. "15-25")
+        String approxAgeRange = data.getApproxAge();
+        if (!approxAgeRange.equals("")) {
+            Tuple<Integer, Integer> ageRange = GeneralUtils.convertStringNumberRangeToInts(approxAgeRange);
+            kid.date.estAgeLower = ageRange.x;
+            kid.date.estAgeHigher = ageRange.y;
+        }
+
+        // Date stuff
+        java.util.Date missingDate = data.getMissingDate();
+        kid.date.dateMissing = missingDate.getTime();
+
+        return kid;
+    }
+
+    public MissingKid() {
+    }
 
     /**
      *  Primary key, for the local database. Not related to any ncmc/ncic/namus ids
@@ -18,28 +61,28 @@ public class MissingKid {
     public int uid;
 
     /**
-     *  National Center for Missing and Exploited Children (NCMEC/NCMC) id (long)
+     *  National Center for Missing and Exploited Children (NCMEC/NCMC) id (String)
      *  <p>
      *  To be appended to "NCMEC" or "NCMC"
      */
     @ColumnInfo(name = "ncmc_id")
-    public long ncmcId;
+    public String ncmcId;
 
     /**
-     *  National Crime Information Center (NCIC) id (long)
+     *  National Crime Information Center (NCIC) id (String)
      *  <p>
      *  Only provided for specific statuses (e.g. Unidentified Child)
      */
     @ColumnInfo(name = "ncic_id")
-    public long ncicId;
+    public String ncicId;
 
     /**
-     *  National Missing and Unidentified Persons System (NAMUS) (long)
+     *  National Missing and Unidentified Persons System (NAMUS) (String)
      *  <p>
      *  Only provided for specific statuses (e.g. Unidentified Child)
      */
     @ColumnInfo(name = "namus_id")
-    public long namusId;
+    public String namusId;
 
     /**
      *  List of associated NCMS ids (e.g. abductors) (long array)

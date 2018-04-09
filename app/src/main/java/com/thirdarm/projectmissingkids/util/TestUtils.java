@@ -1,4 +1,4 @@
-package com.thirdarm.projectmissingkids.Utils;
+package com.thirdarm.projectmissingkids.util;
 
 import com.thirdarm.projectmissingkids.data.Address;
 import com.thirdarm.projectmissingkids.data.Date;
@@ -39,7 +39,7 @@ public class TestUtils {
         kid.height.heightImperial = 56;
         kid.weight = new Weight();
         kid.weight.weightImperial = 94;
-        kid.ncmcId = 982012;
+        kid.ncmcId = "982012";
         kid.posterUrl = "http://api.missingkids.org/poster/NCMC/982012";
         kid.originalPhotoUrl = "http://api.missingkids.org/photographs/NCMC982012c1.jpg";
         kid.source = "National Center for Missing & Exploited Children";
