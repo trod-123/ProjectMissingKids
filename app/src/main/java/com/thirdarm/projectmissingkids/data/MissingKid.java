@@ -16,7 +16,7 @@ public class MissingKid {
 
     public static MissingKid convertFromPartialChildData(ChildData data) {
         MissingKid kid = new MissingKid();
-        kid.ncmcId = Long.parseLong(data.getCaseNumber());
+        kid.ncmcId = data.getCaseNumber();
         kid.source = data.getOrgName();
         kid.originalPhotoUrl = data.getThumbnailURL();
         kid.race = data.getRace();
@@ -61,28 +61,28 @@ public class MissingKid {
     public int uid;
 
     /**
-     *  National Center for Missing and Exploited Children (NCMEC/NCMC) id (long)
+     *  National Center for Missing and Exploited Children (NCMEC/NCMC) id (String)
      *  <p>
      *  To be appended to "NCMEC" or "NCMC"
      */
     @ColumnInfo(name = "ncmc_id")
-    public long ncmcId;
+    public String ncmcId;
 
     /**
-     *  National Crime Information Center (NCIC) id (long)
+     *  National Crime Information Center (NCIC) id (String)
      *  <p>
      *  Only provided for specific statuses (e.g. Unidentified Child)
      */
     @ColumnInfo(name = "ncic_id")
-    public long ncicId;
+    public String ncicId;
 
     /**
-     *  National Missing and Unidentified Persons System (NAMUS) (long)
+     *  National Missing and Unidentified Persons System (NAMUS) (String)
      *  <p>
      *  Only provided for specific statuses (e.g. Unidentified Child)
      */
     @ColumnInfo(name = "namus_id")
-    public long namusId;
+    public String namusId;
 
     /**
      *  List of associated NCMS ids (e.g. abductors) (long array)

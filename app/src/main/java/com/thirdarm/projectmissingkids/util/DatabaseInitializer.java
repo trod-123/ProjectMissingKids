@@ -29,7 +29,7 @@ public class DatabaseInitializer {
         mListener = listener;
 
         // TODO: For testing only! Remove when done
-        deleteAllData(mDb);
+        //deleteAllData(mDb);
 
         FetchDataFromServer task = new FetchDataFromServer();
         task.execute();
@@ -108,6 +108,7 @@ public class DatabaseInitializer {
 
         @Override
         protected void onPostExecute(JSONArray jsonArray) {
+            Log.d(TAG, "JSONArray successfully fetched. Now converting to MissingKid");
             ConvertJsonToMissingKid task = new ConvertJsonToMissingKid();
             task.execute(jsonArray);
         }
@@ -123,6 +124,7 @@ public class DatabaseInitializer {
 
         @Override
         protected void onPostExecute(List<MissingKid> missingKids) {
+            Log.d(TAG, "List of MissingKids successfully obtained. Now loading to local db");
             LoadDbWithMissingKidData task = new LoadDbWithMissingKidData();
             task.execute(missingKids);
         }
@@ -141,6 +143,7 @@ public class DatabaseInitializer {
 
         @Override
         protected void onPostExecute(Void aVoid) {
+            Log.d(TAG, "Database loaded with data successfully. Now to load onto UI...");
             mListener.onFinishedLoading();
         }
     }
