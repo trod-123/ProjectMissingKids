@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -30,24 +31,31 @@ public class MainActivity extends AppCompatActivity implements
 
     public static final int INDEX_NCMC_ID = 123456;
 
+    List<MissingKid> kids;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_kids);
+        mRecyclerView = findViewById(R.id.recyclerview_kids);
 
-        mLoadingIndicator = (ProgressBar) findViewById(R.id.pb_loading_indicator);
+        mLoadingIndicator = findViewById(R.id.pb_loading_indicator);
 
 
         LinearLayoutManager layoutManager =
                 new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
 
+        /** Divider between each item */
+        RecyclerView.ItemDecoration mDivider =
+                new DividerItemDecoration(mRecyclerView.getContext(), layoutManager.getOrientation());
+        mRecyclerView.addItemDecoration(mDivider);
+
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
 
-        mKidsAdapter = new KidsAdapter(this, this);
+        mKidsAdapter = new KidsAdapter(kids, this, this);
+
         mRecyclerView.setAdapter(mKidsAdapter);
 
         showLoading();
@@ -95,6 +103,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onFinishedLoading() {
         // TODO: this is called when FakeDatabaseInitializer.populateAsync() is complete
+        mKidsAdapter.swapList(kids);
         (new MissingKidsFetchTask(mDb)).execute();
     }
 
@@ -112,15 +121,13 @@ public class MainActivity extends AppCompatActivity implements
 
         @Override
         protected void onPostExecute(List<MissingKid> missingKids) {
-            super.onPostExecute(missingKids);
 
             // TODO: Swap empty list or cursor in RecyclerView
-//            mRecyclerView.swapList(missingKids);
+            mKidsAdapter.swapList(missingKids);
+            showView();
         }
+
     }
-
-
-
 
 
 }

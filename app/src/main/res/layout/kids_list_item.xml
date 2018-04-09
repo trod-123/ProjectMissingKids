@@ -107,5 +107,4 @@
         android:textSize="12sp"
         tools:text="Location: SAN RAMON, CA US"/>
 
-
 </android.support.constraint.ConstraintLayout>
