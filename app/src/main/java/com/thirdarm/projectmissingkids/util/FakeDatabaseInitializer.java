@@ -45,7 +45,7 @@ public class FakeDatabaseInitializer {
         String[] firstNames = new String[]{"Amir", "Jazibi", "Jane", "Christine", "Jorge", "Evelyn", "Rachel", "Christina"};
         String[] middleNames = new String[]{"Kareem", "", "", "", "", "Michelle", "Rae", "James"};
         String[] lastNames = new String[]{"Abdou", "Agapito", "Doe 1969", "Aguirre", "Acosta", "Aguilar", "Aguilar", "Albertson"};
-        long[] ncmcIds = new long[]{982012L, 1180655L, 1318681L, 1275372L, 780684L, 1276912L, 1317601L, 1316322L};
+        String[] ncmcIds = new String[]{"982012", "1180655", "1318681", "1275372", "780684", "1276912", "1317601", "1316322"};
         long[] dateOfBirth = new long[]{1474588800000L, 1474588800000L, 1474588800000L, 1474588800000L, 1474588800000L, 1474588800000L, 1474588800000L, 1474588800000L};
         long[] dateMissing = new long[]{System.currentTimeMillis(), System.currentTimeMillis(), System.currentTimeMillis(), System.currentTimeMillis(), System.currentTimeMillis(), System.currentTimeMillis(), System.currentTimeMillis(), System.currentTimeMillis()};
         int[] ages = new int[]{16, 16, -1, 16, 16, 16, 16, 16};
