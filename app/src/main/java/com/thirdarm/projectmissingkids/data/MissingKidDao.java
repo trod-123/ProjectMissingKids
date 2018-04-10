@@ -52,7 +52,7 @@ public interface MissingKidDao {
      * @return The MissingKid associated with the NCMC id
      */
     @Query("SELECT * FROM kids WHERE ncmc_id IS :ncmcId")
-    MissingKid findKidByNcmcId(long ncmcId);
+    MissingKid findKidByNcmcId(String ncmcId);
 
     /**
      * Gets the MissingKid with the provided NCMC id
@@ -61,7 +61,7 @@ public interface MissingKidDao {
      * @return The MissingKid associated with the NCMC id
      */
     @Query("SELECT * FROM kids WHERE ncmc_id IS :ncmcId")
-    Cursor findKidByNcmcIdCursor(long ncmcId);
+    Cursor findKidByNcmcIdCursor(String ncmcId);
 
     /**
      * Gets all the MissingKids with the provided array of NCMC ids (NCMC ids must be unique)
@@ -70,7 +70,7 @@ public interface MissingKidDao {
      * @return The MissingKids associated with the NCMC ids
      */
     @Query("SELECT * FROM kids WHERE ncmc_id IN (:ncmcIds)")
-    List<MissingKid> loadAllKidsByNcmcIds(List<Long> ncmcIds);
+    List<MissingKid> loadAllKidsByNcmcIds(List<String> ncmcIds);
 
     /**
      * Gets all the MissingKids with the provided array of NCMC ids (NCMC ids must be unique)
@@ -79,7 +79,7 @@ public interface MissingKidDao {
      * @return The MissingKids associated with the NCMC ids
      */
     @Query("SELECT * FROM kids WHERE ncmc_id IN (:ncmcIds)")
-    Cursor loadAllKidsByNcmcIdsCursor(List<Long> ncmcIds);
+    Cursor loadAllKidsByNcmcIdsCursor(List<String> ncmcIds);
 
     /**
      * Gets the MissingKid with the provided names
