@@ -73,12 +73,7 @@ public class DatabaseInitializer {
      * @return The list of ChildData
      */
     private static List<ChildData> convertJSONArrayToChildData(JSONArray jsonData) {
-        try {
-            return DataParsingUtils.getChildDataListFromJsonArray(jsonData);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return null;
+        return DataParsingUtils.getChildDataListFromJsonArray(jsonData);
     }
 
     private static void populateAsync(List<MissingKid> missingKids) {

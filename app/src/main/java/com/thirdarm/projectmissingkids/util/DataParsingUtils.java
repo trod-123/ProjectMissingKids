@@ -3,7 +3,6 @@ package com.thirdarm.projectmissingkids.util;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.thirdarm.projectmissingkids.Utils.TestUtils;
 import com.thirdarm.projectmissingkids.data.ChildData;
 
 import org.json.JSONArray;
@@ -102,17 +101,17 @@ public class DataParsingUtils {
     public static ChildData parseChildDataFromJson(JSONObject childJson) throws JSONException {
         String caseNumber = childJson.getString(CASE_NUMBER);
         String orgPrefix = childJson.getString(ORG_PREFIX);
-        String orgName = childJson.getString(ORG_NAME);
-        boolean isChild = childJson.getBoolean(IS_CHILD);
-        int seqNumber = childJson.getInt(SEQ_NUMBER);
-        String langId = childJson.getString(LANG_ID);
-        String firstName = childJson.getString(FIRST_NAME);
-        String lastName = childJson.getString(LAST_NAME);
-        String middleName = childJson.getString(MIDDLE_NAME);
-        String missingCity = childJson.getString(MISSING_CITY);
-        String missingCounty = childJson.getString(MISSING_COUNTY);
-        String missingState = childJson.getString(MISSING_STATE);
-        String missingCountry = childJson.getString(MISSING_COUNTRY);
+        String orgName = childJson.optString(ORG_NAME);
+        boolean isChild = childJson.optBoolean(IS_CHILD);
+        int seqNumber = childJson.optInt(SEQ_NUMBER);
+        String langId = childJson.optString(LANG_ID);
+        String firstName = childJson.optString(FIRST_NAME);
+        String lastName = childJson.optString(LAST_NAME);
+        String middleName = childJson.optString(MIDDLE_NAME);
+        String missingCity = childJson.optString(MISSING_CITY);
+        String missingCounty = childJson.optString(MISSING_COUNTY);
+        String missingState = childJson.optString(MISSING_STATE);
+        String missingCountry = childJson.optString(MISSING_COUNTRY);
         String missingDateStr = childJson.optString(MISSING_DATE);
         Date missingDate = null;
         try {
@@ -122,16 +121,16 @@ public class DataParsingUtils {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        int age = childJson.getInt(AGE);
-        boolean inMonth = childJson.getBoolean(IN_MONTH);
-        boolean inDay = childJson.getBoolean(IN_DAY);
-        String approxAge = childJson.getString(APPROX_AGE);
-        boolean hasThumbnail = childJson.getBoolean(HAS_THUMBNAIL);
-        boolean hasPoster = childJson.getBoolean(HAS_POSTER);
-        String thumbnailUrl = childJson.getString(THUMBNAIL_URL);
-        String caseType = childJson.getString(CASE_TYPE);
-        String posterTitle = childJson.getString(POSTER_TITLE);
-        String race = childJson.getString(RACE);
+        int age = childJson.optInt(AGE);
+        boolean inMonth = childJson.optBoolean(IN_MONTH);
+        boolean inDay = childJson.optBoolean(IN_DAY);
+        String approxAge = childJson.optString(APPROX_AGE);
+        boolean hasThumbnail = childJson.optBoolean(HAS_THUMBNAIL);
+        boolean hasPoster = childJson.optBoolean(HAS_POSTER);
+        String thumbnailUrl = childJson.optString(THUMBNAIL_URL);
+        String caseType = childJson.optString(CASE_TYPE);
+        String posterTitle = childJson.optString(POSTER_TITLE);
+        String race = childJson.optString(RACE);
         return new ChildData(caseNumber, orgPrefix, orgName, isChild, seqNumber,
                 langId, firstName, lastName, middleName, missingCity, missingCounty, missingState,
                 missingCountry, missingDate, age, inMonth, inDay, approxAge, hasThumbnail,
@@ -145,8 +144,7 @@ public class DataParsingUtils {
      * @return the ChildData with the added detail data
      * @throws JSONException if there was a problem parsing the data
      */
-    public static ChildData parseDetailDataForChild(JSONObject childJson, ChildData childData)
-            throws JSONException {
+    public static ChildData parseDetailDataForChild(JSONObject childJson, ChildData childData) {
         // TODO check to see if the detail data is for the same case number as the ChildData
         boolean hasAgedPhoto = childJson.optBoolean(HAS_AGED_PHOTO);
         boolean hasExtraPhoto = childJson.optBoolean(HAS_EXTRA_PHOTO);
