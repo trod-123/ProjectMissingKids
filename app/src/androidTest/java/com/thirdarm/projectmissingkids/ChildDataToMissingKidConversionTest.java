@@ -14,6 +14,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import static com.thirdarm.projectmissingkids.util.DataParsingUtils.parseChildDataFromJson;
+import static com.thirdarm.projectmissingkids.util.DataParsingUtils.parseDetailDataForChild;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
@@ -44,6 +45,29 @@ public class ChildDataToMissingKidConversionTest {
 
         assertEquals(data.getFirstName(), kid.name.firstName);
         assertEquals(data.getThumbnailURL(), kid.originalPhotoUrl);
+    }
+
+    @Test
+    public void testChildDataWithDetailToMissingKidConversion() throws Exception {
+        ChildData partialData = getFirstChildDataFromJsonArray();
+        String caseNumber = partialData.getCaseNumber();
+        String orgPrefix = partialData.getOrgPrefix();
+
+        JSONObject responseJson = null;
+
+        try {
+            responseJson = NetworkUtils.getDetailDataJson(caseNumber, orgPrefix);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            fail("There was a problem grabbing the detail data from the provided caseNumber ("
+                    + caseNumber + ") and orgPrefix (" + orgPrefix + ")");
+        }
+
+        ChildData fullData = parseDetailDataForChild(responseJson, partialData);
+
+        MissingKid kid = MissingKid.convertFromFullChildData(fullData);
+
+        assertNotNull(kid);
     }
 
     private ChildData getFirstChildDataFromJsonArray() {

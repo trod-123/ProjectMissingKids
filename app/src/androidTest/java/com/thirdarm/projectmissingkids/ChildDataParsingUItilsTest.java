@@ -35,13 +35,7 @@ public class ChildDataParsingUItilsTest {
 
     @Test
     public void getChildDataListFromJsonArray() {
-        List<ChildData> data = null;
-        try {
-            data = DataParsingUtils.getChildDataListFromJsonArray(results);
-        } catch (JSONException e) {
-            e.printStackTrace();
-            fail("JSONException thrown when getting the Child Data list");
-        }
+        List<ChildData> data = DataParsingUtils.getChildDataListFromJsonArray(results);
         assertNotNull(data);
     }
 }
