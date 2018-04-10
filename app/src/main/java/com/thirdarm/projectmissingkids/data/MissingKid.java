@@ -45,8 +45,10 @@ public class MissingKid {
         }
 
         // Date stuff
-        java.util.Date missingDate = data.getMissingDate();
-        kid.date.dateMissing = missingDate.getTime();
+        if (data.getMissingDate() != null) {
+            java.util.Date missingDate = data.getMissingDate();
+            kid.date.dateMissing = missingDate.getTime();
+        }
 
         return kid;
     }
