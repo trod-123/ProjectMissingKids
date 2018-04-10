@@ -189,6 +189,77 @@ public class NetworkUtils {
     }
 
     /**
+     * Gets metadata about a search such as total records (field name "totalRecords")
+     * and total pages (field name "totalPages").
+     *
+     * @return a JSONObject containing the metadata, or null if no data was available from the
+     * server.
+     * @throws JSONException if there was a problem parsing the server response.
+     */
+    public static JSONObject getSearchResultsMetadataJson() throws JSONException {
+        URL beginSearchURL = buildJsonDataBeginSearchUrl();
+        try {
+            String beginSearchJsonStr = getResponseFromHttpUrl(beginSearchURL);
+            JSONObject searchResultMetadataJson = new JSONObject(beginSearchJsonStr);
+            if (!searchResultMetadataJson.has("status")) {
+                return null;
+            } else if (!searchResultMetadataJson.getString("status").equals("success")) {
+                return null;
+            } else {
+                return searchResultMetadataJson;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Retrieves the number of total pages from a search metadata JSONObject.
+     *
+     * @param metadata the JSONObject containing the metadata
+     * @return the number of total pages of search data, or 0 if the data is unavailable.
+     */
+    public static int getTotalPagesFromMetadata(JSONObject metadata) {
+        return metadata.optInt(TOTAL_PAGES);
+    }
+
+    /**
+     * Retrieves the number of total records from a search metadata JSONObject.
+     *
+     * @param metadata the JSONObject containing the metadata
+     * @return the number of total records in the search data, or 0 if the data is unavailable.
+     */
+    public static int getTotalRecordsFromMetadata(JSONObject metadata) {
+        return metadata.optInt(TOTAL_RECORDS);
+    }
+
+    /**
+     * Gets one page of search results.
+     *
+     * @param pageNumber the page number to get.
+     * @return a JSONArray containing the given page of search results, or null if the data was
+     * unavailable or the server could not be reached.
+     * @throws JSONException if there was a problem parsing the server response.
+     */
+    public static JSONArray getSearchResultPageJsonArray(int pageNumber) throws JSONException {
+        URL pageUrl = buildJsonDataSearchPageUrl(pageNumber);
+        String pageJsonStr = null;
+        try {
+            pageJsonStr = getResponseFromHttpUrl(pageUrl);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+        JSONObject pageJson = new JSONObject(pageJsonStr);
+        JSONArray pagePersons = null;
+        if (pageJson.has(PERSONS)) {
+            pagePersons = pageJson.optJSONArray(PERSONS);
+        }
+        return pagePersons;
+    }
+
+    /**
      * Retrieves child detail data for a particular case.
      *
      * @param caseNumber the case number of the child for whom detail data is being
