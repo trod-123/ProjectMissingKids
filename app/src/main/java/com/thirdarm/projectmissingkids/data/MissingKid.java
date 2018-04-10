@@ -14,45 +14,148 @@ import com.thirdarm.projectmissingkids.util.Tuple;
 @Entity(tableName = "kids")
 public class MissingKid {
 
-    public static MissingKid convertFromPartialChildData(ChildData data) {
-        MissingKid kid = new MissingKid();
-        kid.ncmcId = data.getCaseNumber();
-        kid.source = data.getOrgName();
-        kid.originalPhotoUrl = data.getThumbnailURL();
-        kid.race = data.getRace();
+    /**
+     * Create a MissingKid object with partial data, but no detail data
+     * @param partialChildData
+     * @return
+     */
+    public static MissingKid convertFromPartialChildData(ChildData partialChildData) {
+        MissingKid partialKidData = new MissingKid();
+        partialKidData.ncmcId = partialChildData.getCaseNumber();
+        partialKidData.source = partialChildData.getOrgName();
+        partialKidData.originalPhotoUrl = partialChildData.getThumbnailURL();
+        partialKidData.race = partialChildData.getRace();
 
         // name
-        kid.name = new Name();
-        kid.name.firstName = data.getFirstName();
-        kid.name.middleName = data.getMiddleName();
-        kid.name.lastName = data.getLastName();
+        partialKidData.name = new Name();
+        partialKidData.name.firstName = partialChildData.getFirstName();
+        partialKidData.name.middleName = partialChildData.getMiddleName();
+        partialKidData.name.lastName = partialChildData.getLastName();
 
         // address
-        kid.address = new Address();
-        kid.address.locCity = data.getMissingCity();
-        kid.address.locState = data.getMissingState();
-        kid.address.locCountry = data.getMissingCountry();
+        partialKidData.address = new Address();
+        partialKidData.address.locCity = partialChildData.getMissingCity();
+        partialKidData.address.locState = partialChildData.getMissingState();
+        partialKidData.address.locCountry = partialChildData.getMissingCountry();
 
-        kid.date = new Date();
-        kid.date.age = data.getAge();
+        partialKidData.date = new Date();
+        partialKidData.date.age = partialChildData.getAge();
 
         // Approx age (ChildData regex: "lower-upper" e.g. "15-25")
-        String approxAgeRange = data.getApproxAge();
+        String approxAgeRange = partialChildData.getApproxAge();
         if (!approxAgeRange.equals("")) {
             Tuple<Integer, Integer> ageRange = GeneralUtils.convertStringNumberRangeToInts(approxAgeRange);
-            kid.date.estAgeLower = ageRange.x;
-            kid.date.estAgeHigher = ageRange.y;
+            partialKidData.date.estAgeLower = ageRange.x;
+            partialKidData.date.estAgeHigher = ageRange.y;
         }
 
         // Date stuff
-        if (data.getMissingDate() != null) {
-            java.util.Date missingDate = data.getMissingDate();
-            kid.date.dateMissing = missingDate.getTime();
+        if (partialChildData.getMissingDate() != null) {
+            java.util.Date missingDate = partialChildData.getMissingDate();
+            partialKidData.date.dateMissing = missingDate.getTime();
+        }
+        if (partialChildData.getBirthDate() != null) {
+            java.util.Date birthDate = partialChildData.getBirthDate();
+            partialKidData.date.dateOfBirth = birthDate.getTime();
         }
 
-        return kid;
+        return partialKidData;
     }
 
+    /**
+     * Create a MissingKid object with detail data, but no partial data
+     * @param detailChildData
+     * @return
+     */
+    public static MissingKid convertFromDetailChildData(ChildData detailChildData) {
+        MissingKid detailKidData = new MissingKid();
+
+        detailKidData.gender = detailChildData.getSex();
+
+
+        // Height stuff
+        detailKidData.height = new Height();
+
+        // store height based on unit of measurement
+        // UI needs to check both: if heightImperial is provided, then use inches. otherwise, use meters
+        if (detailChildData.isHeightInInch()) {
+            detailKidData.height.heightImperial = detailChildData.getHeight();
+        } else {
+            detailKidData.height.heightMetric = detailChildData.getHeight();
+        }
+
+        // Weight stuff
+        detailKidData.weight = new Weight();
+
+        // store weight based on unit of measurement
+        // UI needs to check both: if weightImperial is provided, then use lbs. otherwise, use kg
+        if (detailChildData.isWeightInPound()) {
+            detailKidData.weight.weightImperial = detailChildData.getWeight();
+        } else {
+            detailKidData.weight.weightMetric = detailChildData.getWeight();
+        }
+
+        detailKidData.eyeColor = detailChildData.getEyeColor();
+        detailKidData.hairColor = detailChildData.getHairColor();
+
+        return detailKidData;
+    }
+
+    /**
+     * Create a MissingKid object with full ChildData, with detail ChildData
+     * @param fullChildData
+     * @return
+     */
+    public static MissingKid convertFromFullChildData(ChildData fullChildData) {
+        // Get partialKidData
+        MissingKid partialKidData = convertFromPartialChildData(fullChildData);
+        // Get detailKidData
+        MissingKid detailKidData = convertFromDetailChildData(fullChildData);
+        // merge the kid data
+        return mergePartialDetailMissingKidData(partialKidData, detailKidData);
+    }
+
+    /**
+     * Merge partial and detail MissingKid data into one complete MissingKid object
+     * @param partialKidData
+     * @param detailKidData
+     * @return
+     */
+    public static MissingKid mergePartialDetailMissingKidData(MissingKid partialKidData, MissingKid detailKidData) {
+        MissingKid completeKidData = partialKidData;
+
+        completeKidData.gender = detailKidData.gender;
+
+        // Height stuff
+        completeKidData.height = new Height();
+        completeKidData.height.heightImperial = detailKidData.height.heightImperial;
+        completeKidData.height.heightMetric = detailKidData.height.heightMetric;
+
+        // Weight stuff
+        completeKidData.weight = new Weight();
+        completeKidData.weight.weightImperial = detailKidData.weight.weightImperial;
+        completeKidData.weight.weightMetric = detailKidData.weight.weightMetric;
+
+        completeKidData.eyeColor = detailKidData.eyeColor;
+        completeKidData.hairColor = detailKidData.hairColor;
+
+        return completeKidData;
+    }
+
+    /**
+     * Append detail ChildData with partial MissingKid data into one complete MissingKid object
+     * @param detailChildData
+     * @param partialKidData
+     * @return
+     */
+    public static MissingKid appendDetailChildDataWithPartialKidData(MissingKid partialKidData, ChildData detailChildData) {
+        MissingKid detailKidData = convertFromDetailChildData(detailChildData);
+        return mergePartialDetailMissingKidData(partialKidData, detailKidData);
+    }
+
+    /**
+     * Default constructor
+     */
     public MissingKid() {
     }
 

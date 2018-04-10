@@ -55,6 +55,9 @@ public class ChildData {
     private String altContact;
     private String photoMap;
 
+    public ChildData() {
+    }
+
     public ChildData(String caseNumber, String orgPrefix, String orgName, boolean isChild,
                      int seqNumber, String langId, String firstName, String lastName,
                      String middleName, String missingCity, String missingCounty,
