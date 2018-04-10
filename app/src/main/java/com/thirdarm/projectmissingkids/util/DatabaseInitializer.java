@@ -147,6 +147,7 @@ public class DatabaseInitializer {
             // first get the JSONArray
             JSONArray searchResults;
             try {
+                NetworkUtils.getSearchResultsMetadataJson();
                 searchResults = NetworkUtils.getSearchResultPageJsonArray(1);
             } catch (JSONException e) {
                 e.printStackTrace();

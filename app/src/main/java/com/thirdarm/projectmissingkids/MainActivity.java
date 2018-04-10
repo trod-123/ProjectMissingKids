@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity implements
     private ProgressBar mLoadingIndicator;
 
     public static final int INDEX_NCMC_ID = 123456;
-    public static final String NCMC = "NCMC ID";
+    public static final String UID_KEY = "UID";
 
     List<MissingKid> kids;
 
@@ -69,15 +69,6 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
-    /**
-     * Initialize the database then fill it with fake data
-     */
-//    private void initializeDatabase() {
-//        mDb = MissingKidsDatabase.getMissingKidsDatabase(this);
-//        FakeDatabaseInitializer.populateAsync(mDb, this);
-//
-//        // TODO: AsyncTask will load data. See overridden onFinishedLoading() method below
-//    }
 
 
     /**
@@ -87,9 +78,9 @@ public class MainActivity extends AppCompatActivity implements
      * @param id The NCMC id for the row that was clicked
      */
     @Override
-    public void onClick(long id) {
+    public void onClick(String id) {
         Intent detailIntent = new Intent(MainActivity.this, DetailActivity.class);
-        detailIntent.putExtra(NCMC, id);
+        detailIntent.putExtra(UID_KEY, id);
         startActivity(detailIntent);
     }
 

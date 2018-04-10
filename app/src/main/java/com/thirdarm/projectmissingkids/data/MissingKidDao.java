@@ -46,6 +46,15 @@ public interface MissingKidDao {
     Cursor loadAllKidsCursor();
 
     /**
+     * Gets the MissingKid with the provided  uid
+     *
+     * @param uid The uid
+     * @return The MissingKid associated with the uid
+     */
+    @Query("SELECT * FROM kids WHERE uid IS :uid")
+    MissingKid findKidByUid(int uid);
+
+    /**
      * Gets the MissingKid with the provided NCMC id
      *
      * @param ncmcId The NCMC id

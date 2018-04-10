@@ -28,7 +28,7 @@ public class KidsAdapter extends RecyclerView.Adapter<KidsAdapter.KidsAdapterVie
      * The id is the NCMC number to identify the kid.
      */
     public interface KidsAdapterOnClickHandler {
-        void onClick(long id);
+        void onClick(String id);
     }
 
 
@@ -75,12 +75,6 @@ public class KidsAdapter extends RecyclerView.Adapter<KidsAdapter.KidsAdapterVie
          ******************/
         holder.idView.setText("NCMC" + kid.ncmcId);
 
-        /*******
-         * DOB *
-         *******/
-        long millisecond = kid.date.dateOfBirth;
-        String dateString = DateFormat.format("MMM dd, yyyy", new Date(millisecond)).toString();
-        holder.dobView.setText("DOB: " + dateString);
 
         /*******
          * AGE *
@@ -98,12 +92,6 @@ public class KidsAdapter extends RecyclerView.Adapter<KidsAdapter.KidsAdapterVie
         long millisecond2 = kid.date.dateMissing;
         String missingDateString = DateFormat.format("MMM dd, yyyy", new Date(millisecond2)).toString();
         holder.missingDateView.setText("Missing: " + missingDateString);
-
-        /********
-         * RACE *
-         ********/
-        String race = kid.race;
-        holder.raceView.setText("Race: " + race);
 
 
         /************
@@ -128,10 +116,8 @@ public class KidsAdapter extends RecyclerView.Adapter<KidsAdapter.KidsAdapterVie
 
         final TextView nameView;
         final TextView idView;
-        final TextView dobView;
         final TextView ageView;
         final TextView missingDateView;
-        final TextView raceView;
         final TextView locationView;
 
         KidsAdapterViewHolder(View view) {
@@ -141,10 +127,8 @@ public class KidsAdapter extends RecyclerView.Adapter<KidsAdapter.KidsAdapterVie
 
             nameView = view.findViewById(R.id.name);
             idView = view.findViewById(R.id.ncmc_id);
-            dobView = view.findViewById(R.id.dob);
             ageView = view.findViewById(R.id.age);
             missingDateView = view.findViewById(R.id.missing_date);
-            raceView = view.findViewById(R.id.race);
             locationView = view.findViewById(R.id.location);
 
             view.setOnClickListener(this);
@@ -160,8 +144,8 @@ public class KidsAdapter extends RecyclerView.Adapter<KidsAdapter.KidsAdapterVie
         public void onClick(View view) {
             int adapterPosition = getAdapterPosition();
             MissingKid kid = kids.get(adapterPosition);
-            long ncmcId = Long.valueOf(kid.ncmcId);
-            mClickHandler.onClick(ncmcId);
+            String uId = kid.ncmcId;
+            mClickHandler.onClick(uId);
         }
     }
 
