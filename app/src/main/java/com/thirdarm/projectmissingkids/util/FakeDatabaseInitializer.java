@@ -3,7 +3,9 @@ package com.thirdarm.projectmissingkids.util;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.widget.Adapter;
 
+import com.thirdarm.projectmissingkids.KidsAdapter;
 import com.thirdarm.projectmissingkids.data.Address;
 import com.thirdarm.projectmissingkids.data.Date;
 import com.thirdarm.projectmissingkids.data.Height;
@@ -168,6 +170,7 @@ public class FakeDatabaseInitializer {
         protected void onPostExecute(Void aVoid) {
             mListener.onFinishedLoading();
         }
+
     }
 
 }

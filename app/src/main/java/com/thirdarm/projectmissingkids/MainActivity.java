@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -19,7 +20,8 @@ import com.thirdarm.projectmissingkids.util.FakeDatabaseInitializer;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements
-        KidsAdapter.KidsAdapterOnClickHandler, FakeDatabaseInitializer.OnDbPopulationFinishedListener {
+        KidsAdapter.KidsAdapterOnClickHandler,
+        DatabaseInitializer.OnDbPopulationFinishedListener {
 
     // For keeping reference to db
     MissingKidsDatabase mDb;
@@ -30,51 +32,64 @@ public class MainActivity extends AppCompatActivity implements
     private ProgressBar mLoadingIndicator;
 
     public static final int INDEX_NCMC_ID = 123456;
+    public static final String NCMC = "NCMC ID";
 
+    List<MissingKid> kids;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_kids);
+        mRecyclerView = findViewById(R.id.recyclerview_kids);
 
-        mLoadingIndicator = (ProgressBar) findViewById(R.id.pb_loading_indicator);
+        mLoadingIndicator = findViewById(R.id.pb_loading_indicator);
 
 
         LinearLayoutManager layoutManager =
                 new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
 
+        /* Divider between each item */
+        RecyclerView.ItemDecoration mDivider =
+                new DividerItemDecoration(mRecyclerView.getContext(), layoutManager.getOrientation());
+        mRecyclerView.addItemDecoration(mDivider);
+
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
 
-        mKidsAdapter = new KidsAdapter(this, this);
+        mKidsAdapter = new KidsAdapter(kids, this, this);
+
         mRecyclerView.setAdapter(mKidsAdapter);
 
         showLoading();
 
-        // set up the database with fake data
-        initializeDatabase();
+        // set up the database
+        mDb = MissingKidsDatabase.getMissingKidsDatabase(this);
+        DatabaseInitializer.initializeDbWithOnlineData(mDb, this);
 
     }
 
     /**
      * Initialize the database then fill it with fake data
      */
-    private void initializeDatabase() {
-        mDb = MissingKidsDatabase.getMissingKidsDatabase(this);
-        FakeDatabaseInitializer.populateAsync(mDb, this);
+//    private void initializeDatabase() {
+//        mDb = MissingKidsDatabase.getMissingKidsDatabase(this);
+//        FakeDatabaseInitializer.populateAsync(mDb, this);
+//
+//        // TODO: AsyncTask will load data. See overridden onFinishedLoading() method below
+//    }
 
-        // TODO: AsyncTask will load data. See overridden onFinishedLoading() method below
-    }
 
-
-
+    /**
+     * Get value for NCMC from the onClick
+     * and pass the NCMC id to the detailActivity
+     *
+     * @param id The NCMC id for the row that was clicked
+     */
     @Override
     public void onClick(long id) {
         Intent detailIntent = new Intent(MainActivity.this, DetailActivity.class);
-        // Get Uri for NCMC from MissingKidsContract
-        // and set the uri data to the Intent
+        detailIntent.putExtra(NCMC, id);
         startActivity(detailIntent);
     }
 
@@ -99,6 +114,7 @@ public class MainActivity extends AppCompatActivity implements
         (new MissingKidsFetchTask(mDb)).execute();
     }
 
+
     private class MissingKidsFetchTask extends AsyncTask<Void, Void, List<MissingKid>> {
         MissingKidDao dao;
 
@@ -113,15 +129,10 @@ public class MainActivity extends AppCompatActivity implements
 
         @Override
         protected void onPostExecute(List<MissingKid> missingKids) {
-            super.onPostExecute(missingKids);
 
             // TODO: Swap empty list or cursor in RecyclerView
-//            mRecyclerView.swapList(missingKids);
+            mKidsAdapter.swapList(missingKids);
+            showView();
         }
     }
-
-
-
-
-
 }
