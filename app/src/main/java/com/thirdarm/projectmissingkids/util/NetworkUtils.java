@@ -37,7 +37,7 @@ public class NetworkUtils {
     /* JSON data request parameter names and values */
     private static final String JSON_ACTION_PARAM = "action";
     private static final String JSON_ACTION_SEARCH_VALUE = "publicSearch";
-    private static final String JSON_ACTION_DETAIL_VALUE = "childSearch";
+    private static final String JSON_ACTION_DETAIL_VALUE = "childDetail";
     private static final String JSON_SEARCH_PARAM = "search";
     private static final String JSON_SEARCH_VALUE = "new";
     private static final String JSON_SUBJ_TO_SEARCH_PARAM = "subjToSearch";
@@ -97,11 +97,11 @@ public class NetworkUtils {
      * @param orgPrefix the organization prefix for the case (e.g. "NCMC").
      * @return the URL to use.
      */
-    public static URL buildJsonDataDetailUrl(int caseNumber, String orgPrefix) {
+    public static URL buildJsonDataDetailUrl(String caseNumber, String orgPrefix) {
         Uri jsonUri = Uri.parse(BASE_URL).buildUpon()
                 .appendPath(JSON_PATH)
                 .appendQueryParameter(JSON_ACTION_PARAM, JSON_ACTION_DETAIL_VALUE)
-                .appendQueryParameter(JSON_CASE_NUMBER_PARAM, String.valueOf(caseNumber))
+                .appendQueryParameter(JSON_CASE_NUMBER_PARAM, caseNumber)
                 .appendQueryParameter(JSON_ORG_PREFIX_PARAM, orgPrefix)
                 .build();
         return convertUriToURL(jsonUri);
@@ -268,7 +268,7 @@ public class NetworkUtils {
      * @return a JSONObject containing the detail data, suitable for parsing into ChildData.
      * @throws JSONException if there was a problem parsing the server response.
      */
-    public static JSONObject getDetailDataJson(int caseNumber, String orgPrefix)
+    public static JSONObject getDetailDataJson(String caseNumber, String orgPrefix)
             throws JSONException {
         URL detailURL = buildJsonDataDetailUrl(caseNumber, orgPrefix);
         try {
