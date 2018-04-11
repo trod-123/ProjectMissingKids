@@ -28,10 +28,9 @@ public class MainActivity extends AppCompatActivity implements
 
     private KidsAdapter mKidsAdapter;
     private RecyclerView mRecyclerView;
-    private int mPosition = RecyclerView.NO_POSITION;
     private ProgressBar mLoadingIndicator;
 
-    public static final int INDEX_NCMC_ID = 123456;
+    public static final String ORG_PREFIX_KEY = "ORG_PREFIX";
     public static final String UID_KEY = "UID";
 
     List<MissingKid> kids;
@@ -69,21 +68,6 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
-
-
-    /**
-     * Get value for NCMC from the onClick
-     * and pass the NCMC id to the detailActivity
-     *
-     * @param id The NCMC id for the row that was clicked
-     */
-    @Override
-    public void onClick(String id) {
-        Intent detailIntent = new Intent(MainActivity.this, DetailActivity.class);
-        detailIntent.putExtra(UID_KEY, id);
-        startActivity(detailIntent);
-    }
-
     private void showView() {
         /* First, hide the loading indicator */
         mLoadingIndicator.setVisibility(View.INVISIBLE);
@@ -100,9 +84,22 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onFinishedLoading() {
-        // TODO: this is called when FakeDatabaseInitializer.populateAsync() is complete
+    public void onFinishedLoading(boolean success) {
         (new MissingKidsFetchTask(mDb)).execute();
+    }
+
+    /**
+     * Get value for NCMC from the onClick
+     * and pass the NCMC id to the detailActivity
+     *
+     * @param id The NCMC id for the row that was clicked
+     */
+    @Override
+    public void onClick(String id, String orgPrefix) {
+        Intent detailIntent = new Intent(MainActivity.this, DetailActivity.class);
+        detailIntent.putExtra(UID_KEY, id);
+        detailIntent.putExtra(ORG_PREFIX_KEY, orgPrefix);
+        startActivity(detailIntent);
     }
 
 

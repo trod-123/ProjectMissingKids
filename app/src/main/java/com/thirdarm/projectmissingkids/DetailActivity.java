@@ -17,7 +17,6 @@ import com.thirdarm.projectmissingkids.util.DatabaseInitializer;
 
 import java.util.Date;
 
-
 public class DetailActivity extends AppCompatActivity implements
         LoaderCallbacks<MissingKid>,
         DatabaseInitializer.OnDbPopulationFinishedListener {
@@ -26,6 +25,8 @@ public class DetailActivity extends AppCompatActivity implements
 
     private Bundle intentBundle;
     private String uID;
+    private String orgPrefixID;
+    public static final String ORG_PREFIX_KEY = "ORG_PREFIX";
     public static final String UID_KEY = "UID";
 
     private MissingKidDao mMissingKidDao;
@@ -43,10 +44,10 @@ public class DetailActivity extends AppCompatActivity implements
         intentBundle = getIntent().getExtras();
 
         uID = intentBundle.getString(UID_KEY);
+        orgPrefixID = intentBundle.getString(ORG_PREFIX_KEY);
+
         mDb = MissingKidsDatabase.getMissingKidsDatabase(this);
-        DatabaseInitializer.loadDetailDataIntoPartialKidData(mDb, this, uID, "NCMC");
-
-
+        DatabaseInitializer.loadDetailDataIntoPartialKidData(mDb, this, uID, orgPrefixID);
     }
 
     @Override
@@ -65,14 +66,11 @@ public class DetailActivity extends AppCompatActivity implements
                 }
             }
 
-
             @Override
             public MissingKid loadInBackground() {
-                uID = bundle.getString(UID_KEY);
-                String mUID = uID;
 
                 mMissingKidDao = mDb.missingKidDao();
-                MissingKid kid = mMissingKidDao.findKidByNcmcId(mUID);
+                MissingKid kid = mMissingKidDao.findKidByOrgPrefixCaseNum(orgPrefixID + uID);
 
                 return kid;
             }
@@ -87,10 +85,7 @@ public class DetailActivity extends AppCompatActivity implements
                 super.deliverResult(mMissingKid);
             }
         };
-
-
     }
-
 
     /**
      * Receives the MissingKid data and
@@ -104,8 +99,16 @@ public class DetailActivity extends AppCompatActivity implements
 
         /** Kid Image */
         String picUrl = "http://api.missingkids.org" + data.originalPhotoUrl;
-        Picasso.get().load(picUrl).fit().into(mDetailDataBinding.picturesDetails.kidsImage);
+        Picasso.get().load(picUrl).fit().into(mDetailDataBinding.kidsImage);
 
+        /** Kid Name */
+        String name = data.name.firstName + " " +
+                data.name.middleName + " " +
+                data.name.lastName;
+
+        // Below gets rid of double spaces if there's no middle name
+        String formatedName = name.replaceAll("\\s{2,}", " ").trim();
+        //mDetailDataBinding.cardView.setText(formatedName);
 
         /** Detail */
         mDetailDataBinding.picturesDetails.picturesDetails.setText(data.description);
@@ -115,13 +118,20 @@ public class DetailActivity extends AppCompatActivity implements
         String missingDateString = DateFormat.format("MMM dd, yyyy", new Date(millisecond)).toString();
         mDetailDataBinding.extraDetails.missingSinceDate.setText(missingDateString);
 
+        /** Missing From */
+        String location = data.address.locCity + ", " +
+                data.address.locState + ", " +
+                data.address.locCountry;
+
+        mDetailDataBinding.extraDetails.missingFromLocation.setText(location);
+
         /** DOB */
         long millisecond2 = data.date.dateOfBirth;
         String dobDateString = DateFormat.format("MMM dd, yyyy", new Date(millisecond2)).toString();
         mDetailDataBinding.extraDetails.dobDate.setText(dobDateString);
 
         /** Age Now */
-        //mDetailDataBinding.extraDetails.ageNumber.setText(data.date.age);
+        mDetailDataBinding.extraDetails.ageNumber.setText(String.valueOf(data.date.age));
 
         /** Sex */
         mDetailDataBinding.extraDetails.sexValue.setText(data.gender);
@@ -136,10 +146,22 @@ public class DetailActivity extends AppCompatActivity implements
         mDetailDataBinding.extraDetails.eyeColorValue.setText(data.eyeColor);
 
         /** Height */
-        mDetailDataBinding.extraDetails.heightValue.setText(String.valueOf(data.height.heightMetric));
+        double height = data.height.heightImperial;
+        String heightImperial;
+        if (height > 24) {
+            int inch = (int) Math.round(height % 12);
+            int feet = (int) Math.round(height / 12);
+            heightImperial = String.valueOf(feet) + "' " + String.valueOf(inch) + "\" ";
+        } else {
+            int inches = (int) Math.round(height);
+            heightImperial = String.valueOf(inches) + "\"";
+        }
+        mDetailDataBinding.extraDetails.heightValue.setText(heightImperial);
 
         /** Weight */
-        mDetailDataBinding.extraDetails.weightValue.setText(String.valueOf(data.weight.weightMetric));
+        int roundedWeight = (int) Math.round(data.weight.weightImperial);
+        String weightImperial = String.valueOf(roundedWeight) + " lbs";
+        mDetailDataBinding.extraDetails.weightValue.setText(String.valueOf(weightImperial));
     }
 
     @Override
@@ -154,7 +176,11 @@ public class DetailActivity extends AppCompatActivity implements
      *
      */
     @Override
-    public void onFinishedLoading() {
-        getSupportLoaderManager().initLoader(LOADER_ID, intentBundle, DetailActivity.this);
+    public void onFinishedLoading(boolean success) {
+        if (!success) {
+            //TODO: Show user error message "There was a problem fetching data from the server. Please try again"
+        } else {
+            getSupportLoaderManager().initLoader(LOADER_ID, intentBundle, DetailActivity.this);
+        }
     }
 }

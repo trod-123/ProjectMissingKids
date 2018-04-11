@@ -28,7 +28,7 @@ public class KidsAdapter extends RecyclerView.Adapter<KidsAdapter.KidsAdapterVie
      * The id is the NCMC number to identify the kid.
      */
     public interface KidsAdapterOnClickHandler {
-        void onClick(String id);
+        void onClick(String id, String orgPrefix);
     }
 
 
@@ -41,9 +41,7 @@ public class KidsAdapter extends RecyclerView.Adapter<KidsAdapter.KidsAdapterVie
     @NonNull
     @Override
     public KidsAdapterViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-
         View view = LayoutInflater.from(mContext).inflate(R.layout.kids_list_item, parent, false);
-
         return new KidsAdapterViewHolder(view);
     }
 
@@ -73,8 +71,7 @@ public class KidsAdapter extends RecyclerView.Adapter<KidsAdapter.KidsAdapterVie
         /******************
          * NCMC ID NUMBER *
          ******************/
-        holder.idView.setText("NCMC" + kid.ncmcId);
-
+        holder.idView.setText(kid.orgPrefix + kid.caseNum);
 
         /*******
          * AGE *
@@ -93,7 +90,6 @@ public class KidsAdapter extends RecyclerView.Adapter<KidsAdapter.KidsAdapterVie
         String missingDateString = DateFormat.format("MMM dd, yyyy", new Date(millisecond2)).toString();
         holder.missingDateView.setText("Missing: " + missingDateString);
 
-
         /************
          * LOCATION *
          ************/
@@ -101,7 +97,6 @@ public class KidsAdapter extends RecyclerView.Adapter<KidsAdapter.KidsAdapterVie
                             kid.address.locState + ", " +
                             kid.address.locCountry + " ";
         holder.locationView.setText("Location: " + location);
-
     }
 
     @Override
@@ -144,8 +139,9 @@ public class KidsAdapter extends RecyclerView.Adapter<KidsAdapter.KidsAdapterVie
         public void onClick(View view) {
             int adapterPosition = getAdapterPosition();
             MissingKid kid = kids.get(adapterPosition);
-            String uId = kid.ncmcId;
-            mClickHandler.onClick(uId);
+            String uId = kid.caseNum;
+            String orgPrefix = kid.orgPrefix;
+            mClickHandler.onClick(uId, orgPrefix);
         }
     }
 
