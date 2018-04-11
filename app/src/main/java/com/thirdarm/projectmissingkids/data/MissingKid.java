@@ -74,6 +74,7 @@ public class MissingKid {
         detailKidData.hairColor = detailChildData.getHairColor();
 
         // date of birth
+        detailKidData.date = new Date();
         if (detailChildData.getBirthDate() != null) {
             java.util.Date birthDate = detailChildData.getBirthDate();
             detailKidData.date.dateOfBirth = birthDate.getTime();
@@ -113,20 +114,24 @@ public class MissingKid {
     public static MissingKid mergePartialDetailMissingKidData(MissingKid partialKidData, MissingKid detailKidData) {
         MissingKid completeKidData = partialKidData;
 
+        // descriptions
         completeKidData.gender = detailKidData.gender;
+        completeKidData.race = detailKidData.gender;
+        completeKidData.description = detailKidData.description;
+        completeKidData.eyeColor = detailKidData.eyeColor;
+        completeKidData.hairColor = detailKidData.hairColor;
+
+        // date of birth
+        completeKidData.date = new Date();
+        completeKidData.date.dateOfBirth = detailKidData.date.dateOfBirth;
 
         // Height stuff
         completeKidData.height = new Height();
         completeKidData.height.heightImperial = detailKidData.height.heightImperial;
-        completeKidData.height.heightMetric = detailKidData.height.heightMetric;
 
         // Weight stuff
         completeKidData.weight = new Weight();
         completeKidData.weight.weightImperial = detailKidData.weight.weightImperial;
-        completeKidData.weight.weightMetric = detailKidData.weight.weightMetric;
-
-        completeKidData.eyeColor = detailKidData.eyeColor;
-        completeKidData.hairColor = detailKidData.hairColor;
 
         return completeKidData;
     }
