@@ -7,6 +7,7 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.format.DateFormat;
+import android.view.Window;
 
 import com.squareup.picasso.Picasso;
 import com.thirdarm.projectmissingkids.data.MissingKid;
@@ -99,16 +100,25 @@ public class DetailActivity extends AppCompatActivity implements
 
         /** Kid Image */
         String picUrl = "http://api.missingkids.org" + data.originalPhotoUrl;
-        Picasso.get().load(picUrl).fit().into(mDetailDataBinding.kidsImage);
+        String hiResPic = picUrl.substring(0, picUrl.length() - 5);
+        hiResPic += ".jpg";
+
+        System.out.println(hiResPic);
+
+        Picasso.get().load(hiResPic).fit().into(mDetailDataBinding.pictureCard.kidsImage);
 
         /** Kid Name */
+
+        // App bar shows kid's first name
+        getSupportActionBar().setTitle(data.name.firstName);
+
         String name = data.name.firstName + " " +
                 data.name.middleName + " " +
                 data.name.lastName;
 
         // Below gets rid of double spaces if there's no middle name
         String formatedName = name.replaceAll("\\s{2,}", " ").trim();
-        //mDetailDataBinding.cardView.setText(formatedName);
+        mDetailDataBinding.pictureCard.kidsName.setText(formatedName);
 
         /** Detail */
         mDetailDataBinding.picturesDetails.picturesDetails.setText(data.description);
@@ -134,16 +144,16 @@ public class DetailActivity extends AppCompatActivity implements
         mDetailDataBinding.extraDetails.ageNumber.setText(String.valueOf(data.date.age));
 
         /** Sex */
-        mDetailDataBinding.extraDetails.sexValue.setText(data.gender);
+        mDetailDataBinding.extraDetails.sexValue.setText((data.gender).toUpperCase());
 
         /** Race */
-        mDetailDataBinding.extraDetails.raceValue.setText(data.race);
+        mDetailDataBinding.extraDetails.raceValue.setText((data.race).toUpperCase());
 
         /** Hair Color */
-        mDetailDataBinding.extraDetails.hairColorValue.setText(data.hairColor);
+        mDetailDataBinding.extraDetails.hairColorValue.setText((data.hairColor).toUpperCase());
 
         /** Eye Color */
-        mDetailDataBinding.extraDetails.eyeColorValue.setText(data.eyeColor);
+        mDetailDataBinding.extraDetails.eyeColorValue.setText((data.eyeColor).toUpperCase());
 
         /** Height */
         double height = data.height.heightImperial;

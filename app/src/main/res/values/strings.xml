@@ -14,4 +14,6 @@
     <string name="height_label">Height:</string>
     <string name="weight_label">Weight:</string>
 
+    <string name="bartext">Name</string>
+
 </resources>
