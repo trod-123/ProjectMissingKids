@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.thirdarm.projectmissingkids.data.ChildData;
 import com.thirdarm.projectmissingkids.data.MissingKid;
+import com.thirdarm.projectmissingkids.data.MissingKidDao;
 import com.thirdarm.projectmissingkids.data.MissingKidsDatabase;
 
 import org.json.JSONArray;
@@ -20,7 +21,7 @@ import java.util.List;
  */
 public class DatabaseInitializer {
 
-    private static final String TAG = FakeDatabaseInitializer.class.getSimpleName();
+    private static final String TAG = DatabaseInitializer.class.getSimpleName();
 
     private static MissingKidsDatabase mDb;
     private static OnDbPopulationFinishedListener mListener;
@@ -40,8 +41,8 @@ public class DatabaseInitializer {
         mListener = listener;
 
         // TODO: For testing only! Remove when done
-        RemoveAllDataFromDatabase removeTask = new RemoveAllDataFromDatabase();
-        removeTask.execute();
+        //RemoveAllDataFromDatabase removeTask = new RemoveAllDataFromDatabase();
+        //removeTask.execute();
 
         FetchDataFromServerAndLoadIntoDb task = new FetchDataFromServerAndLoadIntoDb();
         task.execute();
@@ -67,7 +68,7 @@ public class DatabaseInitializer {
     }
 
     public interface OnDbPopulationFinishedListener {
-        void onFinishedLoading();
+        void onFinishedLoading(boolean success);
     }
 
     /**
@@ -129,7 +130,30 @@ public class DatabaseInitializer {
      * @param missingKids The list of MissingKids data
      */
     private static void populateAsync(List<MissingKid> missingKids) {
-        mDb.missingKidDao().insertManyKids(missingKids.toArray(new MissingKid[]{}));
+        MissingKidDao dao = mDb.missingKidDao();
+        int numUpdated = 0;
+        int numInserted = 0;
+        List<String> orgPrefixes = new ArrayList<>();
+        for (MissingKid kid : missingKids) {
+            MissingKid kidFromDb = dao.findKidByOrgPrefixCaseNum(kid.orgPrefixCaseNumber);
+            boolean check = orgPrefixes.contains(kid.orgPrefixCaseNumber);
+            if (check) {
+                Log.e(TAG, "Duplicate ID found!");
+            } else {
+                orgPrefixes.add(kid.orgPrefixCaseNumber);
+            }
+            if (kidFromDb != null) {
+                // update kid only if it already exists in db
+                kid.uid = kidFromDb.uid;
+                numUpdated += dao.updateSingleKid(kid);
+            } else {
+                // otherwise, add the kid
+                dao.insertSingleKid(kid);
+                numInserted++;
+            }
+        }
+        Log.d(TAG, "Total number updated: " + numUpdated);
+        Log.d(TAG, "Total number inserted: " + numInserted);
     }
 
     private static class RemoveAllDataFromDatabase extends AsyncTask<Void, Void, Void> {
@@ -141,6 +165,7 @@ public class DatabaseInitializer {
     }
 
     private static class FetchDataFromServerAndLoadIntoDb extends AsyncTask<Void, Void, Void> {
+        private boolean success = false;
 
         @Override
         protected Void doInBackground(Void... voids) {
@@ -148,7 +173,13 @@ public class DatabaseInitializer {
             JSONArray searchResults;
             try {
                 NetworkUtils.getSearchResultsMetadataJson();
-                searchResults = NetworkUtils.getSearchResultPageJsonArray(1);
+                searchResults = NetworkUtils.getSearchResultsDataJsonArray();
+                if (searchResults != null) {
+                    success = true;
+                } else {
+                    Log.e(TAG, "There was no data returned from the server.");
+                    return null;
+                }
             } catch (JSONException e) {
                 e.printStackTrace();
                 Log.e(TAG, "There was an error getting the search results");
@@ -165,11 +196,13 @@ public class DatabaseInitializer {
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            mListener.onFinishedLoading();
+               mListener.onFinishedLoading(success);
         }
     }
 
     private static class FetchDetailDataFromServerAndLoadIntoDb extends AsyncTask<Void, Void, Void> {
+        private boolean success = false;
+
         private String mCaseNumber;
         private String mOrgPrefix;
 
@@ -181,6 +214,12 @@ public class DatabaseInitializer {
         @Override
         protected Void doInBackground(Void... voids) {
             MissingKid completeKid = appendDetailDataWithPartialKid(mCaseNumber, mOrgPrefix);
+            if (completeKid != null) {
+                success = true;
+            } else {
+                Log.e(TAG, "There was no data returned from the server.");
+                return null;
+            }
             List<MissingKid> kids = new ArrayList<>(Arrays.asList(completeKid));
             populateAsync(kids);
             return null;
@@ -188,15 +227,19 @@ public class DatabaseInitializer {
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            mListener.onFinishedLoading();
+            mListener.onFinishedLoading(success);
         }
     }
 
     private static MissingKid appendDetailDataWithPartialKid(String caseNumber, String orgPrefix) {
-        MissingKid partialKidData = mDb.missingKidDao().findKidByNcmcId(caseNumber);
+        MissingKid partialKidData = mDb.missingKidDao().findKidByOrgPrefixCaseNum(orgPrefix + caseNumber);
         JSONObject detailChildJson = null;
         try {
             detailChildJson = NetworkUtils.getDetailDataJson(caseNumber, orgPrefix);
+            if (detailChildJson == null) {
+                // return null if there is no detailed data available. handle nulls accordingly
+                return null;
+            }
         } catch (JSONException e) {
             e.printStackTrace();
             Log.e(TAG, "There was a problem grabbing the detail data from the provided caseNumber ("
