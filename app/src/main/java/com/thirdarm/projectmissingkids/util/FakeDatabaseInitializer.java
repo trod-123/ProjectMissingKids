@@ -3,9 +3,7 @@ package com.thirdarm.projectmissingkids.util;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.util.Log;
-import android.widget.Adapter;
 
-import com.thirdarm.projectmissingkids.KidsAdapter;
 import com.thirdarm.projectmissingkids.data.Address;
 import com.thirdarm.projectmissingkids.data.Date;
 import com.thirdarm.projectmissingkids.data.Height;
@@ -103,7 +101,9 @@ public class FakeDatabaseInitializer {
             kid.height.estHeightImperialHigher = estimatedHeightUppers[i]; // if height not available, stored as -1
             kid.weight = new Weight();
             kid.weight.weightImperial = weights[i]; // if weight not available, stored as -1
-            kid.ncmcId = ncmcIds[i];
+            kid.caseNum = ncmcIds[i];
+            kid.orgPrefix = "NCMC";
+            kid.orgPrefixCaseNumber = kid.orgPrefix + kid.caseNum;
             kid.posterUrl = "http://api.missingkids.org/poster/NCMC/" + ncmcIds[i];
             kid.originalPhotoUrl = originalPhotoUrls[i];
             kid.source = sources[i];

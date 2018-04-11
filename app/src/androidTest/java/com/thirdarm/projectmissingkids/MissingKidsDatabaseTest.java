@@ -77,7 +77,7 @@ public class MissingKidsDatabaseTest {
         assertEquals(kid.eyeColor, kid2.eyeColor);
         assertEquals(kid.gender, kid2.gender);
         assertEquals(kid.hairColor, kid2.hairColor);
-        assertEquals(kid.ncmcId, kid2.ncmcId);
+        assertEquals(kid.caseNum, kid2.caseNum);
         assertEquals(kid.name.firstName, kid2.name.firstName);
     }
 
@@ -110,7 +110,7 @@ public class MissingKidsDatabaseTest {
                 assertEquals(kid.eyeColor, eyeColor);
                 assertEquals(kid.gender, gender);
                 assertEquals(kid.hairColor, hairColor);
-                assertEquals(kid.ncmcId, ncmcId);
+                assertEquals(kid.caseNum, ncmcId);
                 assertEquals(kid.name.firstName, firstName);
             }
             cursor.close();

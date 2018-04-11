@@ -1,6 +1,5 @@
 package com.thirdarm.projectmissingkids.data;
 
-import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
@@ -57,38 +56,38 @@ public interface MissingKidDao {
     /**
      * Gets the MissingKid with the provided NCMC id
      *
-     * @param ncmcId The NCMC id
+     * @param orgPrefixCaseNumber The unique identifier
      * @return The MissingKid associated with the NCMC id
      */
-    @Query("SELECT * FROM kids WHERE ncmc_id IS :ncmcId")
-    MissingKid findKidByNcmcId(String ncmcId);
+    @Query("SELECT * FROM kids WHERE orgPrefixCaseNumber IS :orgPrefixCaseNumber")
+    MissingKid findKidByOrgPrefixCaseNum(String orgPrefixCaseNumber);
 
     /**
      * Gets the MissingKid with the provided NCMC id
      *
-     * @param ncmcId The NCMC id
+     * @param orgPrefixCaseNumber The unique identifier
      * @return The MissingKid associated with the NCMC id
      */
-    @Query("SELECT * FROM kids WHERE ncmc_id IS :ncmcId")
-    Cursor findKidByNcmcIdCursor(String ncmcId);
+    @Query("SELECT * FROM kids WHERE orgPrefixCaseNumber IS :orgPrefixCaseNumber")
+    Cursor findKidByOrgPrefixCaseNumCursor(String orgPrefixCaseNumber);
 
     /**
      * Gets all the MissingKids with the provided array of NCMC ids (NCMC ids must be unique)
      *
-     * @param ncmcIds The list of NCMC ids
-     * @return The MissingKids associated with the NCMC ids
+     * @param orgPrefixCaseNumbers The list of The unique identifiers
+     * @return The MissingKids associated with the unique identifiers
      */
-    @Query("SELECT * FROM kids WHERE ncmc_id IN (:ncmcIds)")
-    List<MissingKid> loadAllKidsByNcmcIds(List<String> ncmcIds);
+    @Query("SELECT * FROM kids WHERE orgPrefixCaseNumber IN (:orgPrefixCaseNumbers)")
+    List<MissingKid> loadAllKidsByOrgPrefixCaseNum(List<String> orgPrefixCaseNumbers);
 
     /**
      * Gets all the MissingKids with the provided array of NCMC ids (NCMC ids must be unique)
      *
-     * @param ncmcIds The list of NCMC ids
-     * @return The MissingKids associated with the NCMC ids
+     * @param orgPrefixCaseNumbers The list of The unique identifiers
+     * @return The MissingKids associated with the unique identifiers
      */
-    @Query("SELECT * FROM kids WHERE ncmc_id IN (:ncmcIds)")
-    Cursor loadAllKidsByNcmcIdsCursor(List<String> ncmcIds);
+    @Query("SELECT * FROM kids WHERE orgPrefixCaseNumber IN (:orgPrefixCaseNumbers)")
+    Cursor loadAllKidsByOrgPrefixCaseNumCursor(List<String> orgPrefixCaseNumbers);
 
     /**
      * Gets the MissingKid with the provided names

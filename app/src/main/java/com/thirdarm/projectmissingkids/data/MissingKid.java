@@ -3,6 +3,7 @@ package com.thirdarm.projectmissingkids.data;
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 
 import com.thirdarm.projectmissingkids.util.GeneralUtils;
@@ -11,7 +12,8 @@ import com.thirdarm.projectmissingkids.util.Tuple;
 /**
  * This entity represents a MissingKid table within the MissingKidsDatabase.  Contains all the "columns" of an SQLite database table
  */
-@Entity(tableName = "kids")
+@Entity(tableName = "kids",
+        indices = {@Index(value={"orgPrefixCaseNumber"}, unique = true)})
 public class MissingKid {
 
     /**
@@ -21,7 +23,9 @@ public class MissingKid {
      */
     public static MissingKid convertFromPartialChildData(ChildData partialChildData) {
         MissingKid partialKidData = new MissingKid();
-        partialKidData.ncmcId = partialChildData.getCaseNumber();
+        partialKidData.caseNum = partialChildData.getCaseNumber();
+        partialKidData.orgPrefix = partialChildData.getOrgPrefix();
+        partialKidData.orgPrefixCaseNumber = partialKidData.orgPrefix + partialKidData.caseNum;
         partialKidData.source = partialChildData.getOrgName();
         partialKidData.originalPhotoUrl = partialChildData.getThumbnailURL();
         partialKidData.race = partialChildData.getRace();
@@ -116,13 +120,11 @@ public class MissingKid {
 
         // descriptions
         completeKidData.gender = detailKidData.gender;
-        completeKidData.race = detailKidData.gender;
+        completeKidData.race = detailKidData.race;
         completeKidData.description = detailKidData.description;
         completeKidData.eyeColor = detailKidData.eyeColor;
         completeKidData.hairColor = detailKidData.hairColor;
 
-        // date of birth
-        completeKidData.date = new Date();
         completeKidData.date.dateOfBirth = detailKidData.date.dateOfBirth;
 
         // Height stuff
@@ -160,12 +162,19 @@ public class MissingKid {
     public int uid;
 
     /**
-     *  National Center for Missing and Exploited Children (NCMEC/NCMC) id (String)
-     *  <p>
-     *  To be appended to "NCMEC" or "NCMC"
+     *  The case number
      */
-    @ColumnInfo(name = "ncmc_id")
-    public String ncmcId;
+    public String caseNum;
+
+    /**
+     * The organization prefix
+     */
+    public String orgPrefix;
+
+    /**
+     * Organization prefix combined with Case number (to be used as the unique id)
+     */
+    public String orgPrefixCaseNumber;
 
     /**
      *  National Crime Information Center (NCIC) id (String)
