@@ -92,7 +92,7 @@ public class ChildData {
     }
 
     public void addDetailData(boolean hasAgedPhoto, boolean hasExtraPhoto, String possibleLocation,
-                              String sex, Date birthDate, int height, boolean heightInInch,
+                              String sex, String race, Date birthDate, int height, boolean heightInInch,
                               int weight, boolean weightInPound, String eyeColor, String hairColor,
                               boolean hasPhoto, String missingProvince, String circumstance,
                               String profileNarrative, String orgContactInfo, String orgLogo,
@@ -102,6 +102,7 @@ public class ChildData {
         this.hasExtraPhoto = hasExtraPhoto;
         this.possibleLocation = possibleLocation;
         this.sex = sex;
+        this.race = race;
         this.birthDate = birthDate;
         this.height = height;
         this.heightInInch = heightInInch;

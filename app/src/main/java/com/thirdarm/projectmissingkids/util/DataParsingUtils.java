@@ -139,17 +139,19 @@ public class DataParsingUtils {
 
     /**
      * Parses the detail data for a child and adds it to the ChildData object for that child
+     *
      * @param childJson the JSONObject containing the detail data to be parsed
      * @param childData the ChildData object to add the detail data to
      * @return the ChildData with the added detail data
-     * @throws JSONException if there was a problem parsing the data
      */
     public static ChildData parseDetailDataForChild(JSONObject childJson, ChildData childData) {
+        Log.d(TAG, "childJson: " + childJson.toString());
         // TODO check to see if the detail data is for the same case number as the ChildData
         boolean hasAgedPhoto = childJson.optBoolean(HAS_AGED_PHOTO);
         boolean hasExtraPhoto = childJson.optBoolean(HAS_EXTRA_PHOTO);
         String possibleLocation = childJson.optString(POSSIBLE_LOCATION);
         String sex = childJson.optString(SEX);
+        String race = childJson.optString(RACE);
         String birthDateStr = childJson.optString(BIRTH_DATE);
         Date birthDate = null;
         try {
@@ -175,7 +177,7 @@ public class DataParsingUtils {
         String repSightURL = childJson.optString(REP_SIGHT_URL);
         String altContact = childJson.optString(ALT_CONTACT);
         String photoMap = childJson.optString(PHOTO_MAP);
-        childData.addDetailData(hasAgedPhoto, hasExtraPhoto, possibleLocation, sex, birthDate,
+        childData.addDetailData(hasAgedPhoto, hasExtraPhoto, possibleLocation, sex, race, birthDate,
                 height, heightInInch, weight, weightInPound, eyeColor, hairColor, hasPhoto,
                 missingProvince, circumstance, profileNarrative, orgContactInfo, orgLogo,
                 isClearinghouse, repSightURL, altContact, photoMap);
