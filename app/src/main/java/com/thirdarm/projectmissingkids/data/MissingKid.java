@@ -49,14 +49,10 @@ public class MissingKid {
             partialKidData.date.estAgeHigher = ageRange.y;
         }
 
-        // Date stuff
+        // missing date
         if (partialChildData.getMissingDate() != null) {
             java.util.Date missingDate = partialChildData.getMissingDate();
             partialKidData.date.dateMissing = missingDate.getTime();
-        }
-        if (partialChildData.getBirthDate() != null) {
-            java.util.Date birthDate = partialChildData.getBirthDate();
-            partialKidData.date.dateOfBirth = birthDate.getTime();
         }
 
         return partialKidData;
@@ -70,33 +66,26 @@ public class MissingKid {
     public static MissingKid convertFromDetailChildData(ChildData detailChildData) {
         MissingKid detailKidData = new MissingKid();
 
+        // descriptions
         detailKidData.gender = detailChildData.getSex();
-
-
-        // Height stuff
-        detailKidData.height = new Height();
-
-        // store height based on unit of measurement
-        // UI needs to check both: if heightImperial is provided, then use inches. otherwise, use meters
-        if (detailChildData.isHeightInInch()) {
-            detailKidData.height.heightImperial = detailChildData.getHeight();
-        } else {
-            detailKidData.height.heightMetric = detailChildData.getHeight();
-        }
-
-        // Weight stuff
-        detailKidData.weight = new Weight();
-
-        // store weight based on unit of measurement
-        // UI needs to check both: if weightImperial is provided, then use lbs. otherwise, use kg
-        if (detailChildData.isWeightInPound()) {
-            detailKidData.weight.weightImperial = detailChildData.getWeight();
-        } else {
-            detailKidData.weight.weightMetric = detailChildData.getWeight();
-        }
-
+        detailKidData.race = detailChildData.getRace();
+        detailKidData.description = detailChildData.getCircumstance();
         detailKidData.eyeColor = detailChildData.getEyeColor();
         detailKidData.hairColor = detailChildData.getHairColor();
+
+        // date of birth
+        if (detailChildData.getBirthDate() != null) {
+            java.util.Date birthDate = detailChildData.getBirthDate();
+            detailKidData.date.dateOfBirth = birthDate.getTime();
+        }
+
+        // Height
+        detailKidData.height = new Height();
+        detailKidData.height.heightImperial = detailChildData.getHeight();
+
+        // Weight
+        detailKidData.weight = new Weight();
+        detailKidData.weight.weightImperial = detailChildData.getWeight();
 
         return detailKidData;
     }
