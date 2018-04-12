@@ -13,7 +13,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
-        android:paddingBottom="8dp"/>
+        android:paddingBottom="8dp"
+        android:scrollbars="vertical"/>
 
 
     <!-- A progress bar that will be shown to users to indicate that missing kids' data is loading -->
