@@ -54,13 +54,13 @@ public interface MissingKidDao {
     @Query("SELECT * FROM kids")
     Cursor loadAllKidsCursor();
 
-    /**
-     * Gets all the MissingKids currently in the database
-     *
-     * @return List of all MissingKids
-     */
-    @Query("SELECT * FROM kids")
-    LiveData<Cursor> loadAllKidsCursorSync();
+//    /**
+//     * Gets all the MissingKids currently in the database
+//     *
+//     * @return List of all MissingKids
+//     */
+//    @Query("SELECT * FROM kids")
+//    LiveData<Cursor> loadAllKidsCursorSync();
 
     /**
      * Gets the MissingKid with the provided  uid
@@ -107,14 +107,14 @@ public interface MissingKidDao {
     @Query("SELECT * FROM kids WHERE orgPrefixCaseNumber IS :orgPrefixCaseNumber")
     Cursor findKidByOrgPrefixCaseNumCursor(String orgPrefixCaseNumber);
 
-    /**
-     * Gets the MissingKid with the provided NCMC id
-     *
-     * @param orgPrefixCaseNumber The unique identifier
-     * @return The MissingKid associated with the NCMC id
-     */
-    @Query("SELECT * FROM kids WHERE orgPrefixCaseNumber IS :orgPrefixCaseNumber")
-    LiveData<Cursor> findKidByOrgPrefixCaseNumCursorSync(String orgPrefixCaseNumber);
+//    /**
+//     * Gets the MissingKid with the provided NCMC id
+//     *
+//     * @param orgPrefixCaseNumber The unique identifier
+//     * @return The MissingKid associated with the NCMC id
+//     */
+//    @Query("SELECT * FROM kids WHERE orgPrefixCaseNumber IS :orgPrefixCaseNumber")
+//    LiveData<Cursor> findKidByOrgPrefixCaseNumCursorSync(String orgPrefixCaseNumber);
 
     /**
      * Gets all the MissingKids with the provided array of NCMC ids (NCMC ids must be unique)
@@ -143,14 +143,14 @@ public interface MissingKidDao {
     @Query("SELECT * FROM kids WHERE orgPrefixCaseNumber IN (:orgPrefixCaseNumbers)")
     Cursor loadAllKidsByOrgPrefixCaseNumCursor(List<String> orgPrefixCaseNumbers);
 
-    /**
-     * Gets all the MissingKids with the provided array of NCMC ids (NCMC ids must be unique)
-     *
-     * @param orgPrefixCaseNumbers The list of The unique identifiers
-     * @return The MissingKids associated with the unique identifiers
-     */
-    @Query("SELECT * FROM kids WHERE orgPrefixCaseNumber IN (:orgPrefixCaseNumbers)")
-    LiveData<Cursor> loadAllKidsByOrgPrefixCaseNumCursorSync(List<String> orgPrefixCaseNumbers);
+//    /**
+//     * Gets all the MissingKids with the provided array of NCMC ids (NCMC ids must be unique)
+//     *
+//     * @param orgPrefixCaseNumbers The list of The unique identifiers
+//     * @return The MissingKids associated with the unique identifiers
+//     */
+//    @Query("SELECT * FROM kids WHERE orgPrefixCaseNumber IN (:orgPrefixCaseNumbers)")
+//    LiveData<Cursor> loadAllKidsByOrgPrefixCaseNumCursorSync(List<String> orgPrefixCaseNumbers);
 
     /**
      * Gets the MissingKid with the provided names
@@ -185,16 +185,16 @@ public interface MissingKidDao {
             "last_name LIKE :last LIMIT 1")
     Cursor findKidByNameCursor(String first, String last);
 
-    /**
-     * Gets the MissingKid with the provided names
-     *
-     * @param first First name of the MissingKid
-     * @param last  Last name of the MissingKid
-     * @return The MissingKid with the provided first AND last names
-     */
-    @Query("SELECT * FROM kids WHERE first_name LIKE :first AND " +
-            "last_name LIKE :last LIMIT 1")
-    LiveData<Cursor> findKidByNameCursorSync(String first, String last);
+//    /**
+//     * Gets the MissingKid with the provided names
+//     *
+//     * @param first First name of the MissingKid
+//     * @param last  Last name of the MissingKid
+//     * @return The MissingKid with the provided first AND last names
+//     */
+//    @Query("SELECT * FROM kids WHERE first_name LIKE :first AND " +
+//            "last_name LIKE :last LIMIT 1")
+//    LiveData<Cursor> findKidByNameCursorSync(String first, String last);
 
     /**
      * Searches for MissingKids with the provided name
@@ -226,15 +226,15 @@ public interface MissingKidDao {
             "OR last_name LIKE :search")
     Cursor findAllKidsByNameCursor(String search);
 
-    /**
-     * Searches for MissingKids with the provided name
-     *
-     * @param search The name to search
-     * @return The MissingKids with a first OR last name that matches the provided search parameter
-     */
-    @Query("SELECT * FROM kids WHERE first_name LIKE :search " +
-            "OR last_name LIKE :search")
-    LiveData<Cursor> findAllKidsByNameCursorSync(String search);
+//    /**
+//     * Searches for MissingKids with the provided name
+//     *
+//     * @param search The name to search
+//     * @return The MissingKids with a first OR last name that matches the provided search parameter
+//     */
+//    @Query("SELECT * FROM kids WHERE first_name LIKE :search " +
+//            "OR last_name LIKE :search")
+//    LiveData<Cursor> findAllKidsByNameCursorSync(String search);
 
     /**
      * Searches for MissingKids that are between the provided age range
@@ -266,15 +266,15 @@ public interface MissingKidDao {
     @Query("SELECT * FROM kids WHERE age BETWEEN :minAge AND :maxAge")
     Cursor findAllKidsBetweenAgesCursor(int minAge, int maxAge);
 
-    /**
-     * Searches for MissingKids that are between the provided age range
-     *
-     * @param minAge The min age to search
-     * @param maxAge The max age to search
-     * @return The MissingKids whose ages are between the provided age range
-     */
-    @Query("SELECT * FROM kids WHERE age BETWEEN :minAge AND :maxAge")
-    LiveData<Cursor> findAllKidsBetweenAgesCursorSync(int minAge, int maxAge);
+//    /**
+//     * Searches for MissingKids that are between the provided age range
+//     *
+//     * @param minAge The min age to search
+//     * @param maxAge The max age to search
+//     * @return The MissingKids whose ages are between the provided age range
+//     */
+//    @Query("SELECT * FROM kids WHERE age BETWEEN :minAge AND :maxAge")
+//    LiveData<Cursor> findAllKidsBetweenAgesCursorSync(int minAge, int maxAge);
 
     /**
      * Searches for MissingKids that are last seen or found in any of the provided list of cities
@@ -303,14 +303,14 @@ public interface MissingKidDao {
     @Query("SELECT * FROM kids WHERE loc_city IN (:cities)")
     Cursor findAllKidsFromCitiesCursor(List<String> cities);
 
-    /**
-     * Searches for MissingKids that are last seen or found in any of the provided list of cities
-     *
-     * @param cities List of cities to search
-     * @return The MissingKids who are last seen or found in the provided list of cities
-     */
-    @Query("SELECT * FROM kids WHERE loc_city IN (:cities)")
-    LiveData<Cursor> findAllKidsFromCitiesCursorSync(List<String> cities);
+//    /**
+//     * Searches for MissingKids that are last seen or found in any of the provided list of cities
+//     *
+//     * @param cities List of cities to search
+//     * @return The MissingKids who are last seen or found in the provided list of cities
+//     */
+//    @Query("SELECT * FROM kids WHERE loc_city IN (:cities)")
+//    LiveData<Cursor> findAllKidsFromCitiesCursorSync(List<String> cities);
 
     /**
      * Searches for MissingKids that are last seen or found in any of the provided list of states. States must be formatted using the ANSI 2-letter abbreviation standard.
@@ -339,14 +339,14 @@ public interface MissingKidDao {
     @Query("SELECT * FROM kids WHERE loc_state IN (:states)")
     Cursor findAllKidsFromStatesCursor(List<String> states);
 
-    /**
-     * Searches for MissingKids that are last seen or found in any of the provided list of states. States must be formatted using the ANSI 2-letter abbreviation standard.
-     *
-     * @param states List of states to search, in ANSI 2-letter abbreviaion standard
-     * @return The MissingKids who are last seen or found in the provided list of states
-     */
-    @Query("SELECT * FROM kids WHERE loc_state IN (:states)")
-    LiveData<Cursor> findAllKidsFromStatesCursorSync(List<String> states);
+//    /**
+//     * Searches for MissingKids that are last seen or found in any of the provided list of states. States must be formatted using the ANSI 2-letter abbreviation standard.
+//     *
+//     * @param states List of states to search, in ANSI 2-letter abbreviaion standard
+//     * @return The MissingKids who are last seen or found in the provided list of states
+//     */
+//    @Query("SELECT * FROM kids WHERE loc_state IN (:states)")
+//    LiveData<Cursor> findAllKidsFromStatesCursorSync(List<String> states);
 
     /**
      * Searches for MissingKids that are last seen or found in any of the provided list of countries. Countries must be formatted using the 2-letter country code, based on ISO 3166-1 alpha-2 standard.
@@ -375,14 +375,14 @@ public interface MissingKidDao {
     @Query("SELECT * FROM kids WHERE loc_country IN (:countries)")
     Cursor findAllKidsFromCountriesCursor(List<String> countries);
 
-    /**
-     * Searches for MissingKids that are last seen or found in any of the provided list of countries. Countries must be formatted using the 2-letter country code, based on ISO 3166-1 alpha-2 standard.
-     *
-     * @param countries List of countries to search, in 2-letter country code, based on ISO 3166-1 alpha-2 standard
-     * @return The MissingKids who are last seen or found in the provided list of countries
-     */
-    @Query("SELECT * FROM kids WHERE loc_country IN (:countries)")
-    LiveData<Cursor> findAllKidsFromCountriesCursorSync(List<String> countries);
+//    /**
+//     * Searches for MissingKids that are last seen or found in any of the provided list of countries. Countries must be formatted using the 2-letter country code, based on ISO 3166-1 alpha-2 standard.
+//     *
+//     * @param countries List of countries to search, in 2-letter country code, based on ISO 3166-1 alpha-2 standard
+//     * @return The MissingKids who are last seen or found in the provided list of countries
+//     */
+//    @Query("SELECT * FROM kids WHERE loc_country IN (:countries)")
+//    LiveData<Cursor> findAllKidsFromCountriesCursorSync(List<String> countries);
 
     // </editor-fold>
 
