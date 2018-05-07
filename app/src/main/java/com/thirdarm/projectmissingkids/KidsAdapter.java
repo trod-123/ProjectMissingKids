@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 import com.thirdarm.projectmissingkids.data.MissingKid;
@@ -117,6 +118,7 @@ public class KidsAdapter extends RecyclerView.Adapter<KidsAdapter.KidsAdapterVie
 
         KidsAdapterViewHolder(View view) {
             super(view);
+            view.setOnClickListener(this);
 
             thumbnailView = view.findViewById(R.id.image_small);
 
@@ -125,8 +127,6 @@ public class KidsAdapter extends RecyclerView.Adapter<KidsAdapter.KidsAdapterVie
             ageView = view.findViewById(R.id.age);
             missingDateView = view.findViewById(R.id.missing_date);
             locationView = view.findViewById(R.id.location);
-
-            view.setOnClickListener(this);
         }
 
         /**
@@ -138,10 +138,15 @@ public class KidsAdapter extends RecyclerView.Adapter<KidsAdapter.KidsAdapterVie
         @Override
         public void onClick(View view) {
             int adapterPosition = getAdapterPosition();
-            MissingKid kid = kids.get(adapterPosition);
-            String uId = kid.caseNum;
-            String orgPrefix = kid.orgPrefix;
-            mClickHandler.onClick(uId, orgPrefix);
+            // Ensure that item exists even through list swapping, or else app would crash
+            if (adapterPosition != RecyclerView.NO_POSITION) {
+                MissingKid kid = kids.get(adapterPosition);
+                String uId = kid.caseNum;
+                String orgPrefix = kid.orgPrefix;
+                mClickHandler.onClick(uId, orgPrefix);
+            } else {
+                Toast.makeText(view.getContext(), "Click error", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
