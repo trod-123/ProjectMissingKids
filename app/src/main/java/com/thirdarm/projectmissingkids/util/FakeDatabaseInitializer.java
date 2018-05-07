@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * [DEPRECATED]
  * Utility class to fill the db with fake data. If data already exists in the db, that data is deleted beforehand
  */
 public class FakeDatabaseInitializer {

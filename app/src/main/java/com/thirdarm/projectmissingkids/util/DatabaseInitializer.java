@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
+ * [DEPRECATED IN FAVOR OF {@link com.thirdarm.projectmissingkids.sync.KidsSyncTask}]
  * Initializes the database and loads it with online content
  */
 public class DatabaseInitializer {
@@ -24,7 +25,6 @@ public class DatabaseInitializer {
     private static final String TAG = DatabaseInitializer.class.getSimpleName();
 
     private static MissingKidsDatabase mDb;
-    private static OnDbPopulationFinishedListener mListener;
 
     /**
      * Initialize the database with fresh online data
@@ -33,42 +33,36 @@ public class DatabaseInitializer {
      * </p>
      *
      * @param db
-     * @param listener
      */
-    public static void initializeDbWithOnlineData(MissingKidsDatabase db,
-                                                  OnDbPopulationFinishedListener listener) {
+    public static void initializeDbWithOnlineData(MissingKidsDatabase db) {
         mDb = db;
-        mListener = listener;
 
         // TODO: For testing only! Remove when done
         //RemoveAllDataFromDatabase removeTask = new RemoveAllDataFromDatabase();
         //removeTask.execute();
 
-        FetchDataFromServerAndLoadIntoDb task = new FetchDataFromServerAndLoadIntoDb();
-        task.execute();
+        String previousHeadCaseNum = "";
+
+        for (int i = 1; i < 70; i++) {
+            FetchDataFromServerAndLoadIntoDb task = new FetchDataFromServerAndLoadIntoDb(previousHeadCaseNum);
+            task.execute(i);
+        }
     }
 
     /**
      * Load detail data into the partial kid data, provided by the kid's case number and the org prefix
      *
      * @param db
-     * @param listener
      * @param caseNumber
      * @param orgPrefix
      */
     public static void loadDetailDataIntoPartialKidData(MissingKidsDatabase db,
-                                                        OnDbPopulationFinishedListener listener,
                                                         String caseNumber, String orgPrefix) {
         mDb = db;
-        mListener = listener;
 
         FetchDetailDataFromServerAndLoadIntoDb task =
                 new FetchDetailDataFromServerAndLoadIntoDb(caseNumber, orgPrefix);
-        task.execute();
-    }
-
-    public interface OnDbPopulationFinishedListener {
-        void onFinishedLoading(boolean success);
+        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     /**
@@ -164,18 +158,39 @@ public class DatabaseInitializer {
         }
     }
 
-    private static class FetchDataFromServerAndLoadIntoDb extends AsyncTask<Void, Void, Void> {
-        private boolean success = false;
+    private static class FetchDataFromServerAndLoadIntoDb extends AsyncTask<Integer, Void, String> {
+
+        String previousHeadCaseNum;
+
+        public FetchDataFromServerAndLoadIntoDb(String caseNum) {
+            previousHeadCaseNum = caseNum;
+        }
 
         @Override
-        protected Void doInBackground(Void... voids) {
+        protected String doInBackground(Integer... pageNums) {
             // first get the JSONArray
             JSONArray searchResults;
             try {
                 NetworkUtils.getSearchResultsMetadataJson();
-                searchResults = NetworkUtils.getSearchResultsDataJsonArray();
+                searchResults = NetworkUtils.getSearchResultPageJsonArray(pageNums[0]);
                 if (searchResults != null) {
-                    success = true;
+                    // then convert the JSONArray into ChildObjects
+                    List<ChildData> childData = convertJSONArrayToChildData(searchResults);
+
+                    // check to see if we should stop incrementing through pages, that is if
+                    // the first case number in the current page is the same as the first case
+                    // number in the previous page
+                    String currentHeadCaseNum = childData.get(0).getCaseNumber();
+                    if (currentHeadCaseNum.equals(previousHeadCaseNum)) {
+                        Log.d(TAG, "Reached the end of the list");
+                        return null;
+                    }
+
+                    // convert the ChildObjects into MissingKids
+                    // TODO: Currently this replaces all detail data with null
+                    List<MissingKid> missingKids = convertChildDataToMissingKid(childData);
+                    // populate the database with the MissingKids
+                    populateAsync(missingKids);
                 } else {
                     Log.e(TAG, "There was no data returned from the server.");
                     return null;
@@ -185,18 +200,12 @@ public class DatabaseInitializer {
                 Log.e(TAG, "There was an error getting the search results");
                 return null;
             }
-            // then convert the JSONArray into ChildObjects
-            List<ChildData> childData = convertJSONArrayToChildData(searchResults);
-            // convert the ChildObjects into MissingKids
-            List<MissingKid> missingKids = convertChildDataToMissingKid(childData);
-            // populate the database with the MissingKids
-            populateAsync(missingKids);
             return null;
         }
 
         @Override
-        protected void onPostExecute(Void aVoid) {
-               mListener.onFinishedLoading(success);
+        protected void onPostExecute(String aVoid) {
+
         }
     }
 
@@ -227,7 +236,7 @@ public class DatabaseInitializer {
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            mListener.onFinishedLoading(success);
+
         }
     }
 

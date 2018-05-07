@@ -10,7 +10,6 @@ import com.thirdarm.projectmissingkids.util.TestUtils;
 import com.thirdarm.projectmissingkids.data.MissingKid;
 import com.thirdarm.projectmissingkids.data.MissingKidDao;
 import com.thirdarm.projectmissingkids.data.MissingKidsDatabase;
-import com.thirdarm.projectmissingkids.util.FakeDatabaseInitializer;
 
 import org.junit.After;
 import org.junit.Before;
@@ -18,11 +17,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -47,6 +44,7 @@ public class MissingKidsDatabaseTest {
 
     /**
      * Closes the database once testing is completed
+     *
      * @throws IOException
      */
     @After
@@ -56,7 +54,8 @@ public class MissingKidsDatabaseTest {
     }
 
     /**
-     *  Inserts a dummy MissingKid object into the database, and accesses the object from the database via a search query that returns a list of MissingKids. Verifies equivalence between the MissingKid that was inserted, and what is accessed
+     * Inserts a dummy MissingKid object into the database, and accesses the object from the database via a search query that returns a list of MissingKids. Verifies equivalence between the MissingKid that was inserted, and what is accessed
+     *
      * @throws Exception
      */
     @Test
@@ -83,6 +82,7 @@ public class MissingKidsDatabaseTest {
 
     /**
      * Inserts a dummy MissingKid object into the database, and access the object from the database via a search query that returns a cursor of MissingKids. Verifies equivalence between the MissingKid that was inserted, and what is accessed
+     *
      * @throws Exception
      */
     @Test
@@ -115,30 +115,6 @@ public class MissingKidsDatabaseTest {
             }
             cursor.close();
         }
-    }
-
-    @Test
-    public void testFakeDatabaseInitializer() throws Exception {
-        // delete database
-        FakeDatabaseInitializer.deleteAllData(mDb);
-
-        // populate the fake database
-        FakeDatabaseInitializer.populateSync(mDb);
-
-        List<MissingKid> kids = FakeDatabaseInitializer.getFakeKids();
-        List<String> firstNames = new ArrayList<>();
-        for (MissingKid kid : kids) {
-            String firstName = kid.name.firstName;
-            firstNames.add(firstName);
-        }
-
-        // query the database for missing kids
-        Cursor cursor = mMissingKidDao.loadAllKidsCursor();
-        cursor.moveToFirst();
-        do {
-            String firstName = cursor.getString(cursor.getColumnIndex("first_name"));
-            assertTrue(firstNames.contains(firstName));
-        } while (cursor.moveToNext());
     }
 
 //    @Test
