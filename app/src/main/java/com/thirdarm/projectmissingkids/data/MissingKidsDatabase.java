@@ -15,7 +15,13 @@ public abstract class MissingKidsDatabase extends RoomDatabase {
 
     public abstract MissingKidDao missingKidDao();
 
-    public static MissingKidsDatabase getMissingKidsDatabase(Context context) {
+    /**
+     * Used to get the singleton instance of the database. This persists across the lifecycle of the
+     * app. Use this instead of constructing a new database object
+     * @param context
+     * @return
+     */
+    public static synchronized MissingKidsDatabase getInstance(Context context) {
         if (INSTANCE == null) {
             INSTANCE = Room.databaseBuilder(context.getApplicationContext(), MissingKidsDatabase.class, "missingKidsDatabase.db")
                     .fallbackToDestructiveMigrationFrom(1)
@@ -24,6 +30,9 @@ public abstract class MissingKidsDatabase extends RoomDatabase {
         return INSTANCE;
     }
 
+    /**
+     * Destroys the current instance of the MissingKidsDatabase
+     */
     public static void destroyInstance() {
         INSTANCE = null;
     }

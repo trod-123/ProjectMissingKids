@@ -11,6 +11,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <activity android:name=".MainActivity"
             android:launchMode="singleTop">
             <intent-filter>
@@ -30,9 +31,9 @@
                 android:value=".MainActivity"/>
         </activity>
 
-
-
-
+        <service
+            android:name=".sync.KidsSyncIntentService"
+            android:exported="false"/>
 
     </application>
 
