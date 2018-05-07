@@ -12,6 +12,7 @@ import com.squareup.picasso.Picasso;
 import com.thirdarm.projectmissingkids.data.MissingKid;
 import com.thirdarm.projectmissingkids.data.MissingKidsDatabase;
 import com.thirdarm.projectmissingkids.databinding.ActivityDetailBinding;
+import com.thirdarm.projectmissingkids.sync.KidsSyncUtils;
 import com.thirdarm.projectmissingkids.viewmodel.LiveDataDetailKidViewModel;
 
 import java.util.Date;
@@ -56,6 +57,9 @@ public class DetailActivity extends AppCompatActivity {
     private void subscribe() {
         // load the kids
         mLiveDataDetailKidViewModel.loadKidDetailsFromLocalDbAsync(mDb, orgPrefixID + uID);
+
+        // load detail data
+        KidsSyncUtils.fetchDetailDataFromServer(this, uID, orgPrefixID);
 
         // set up the observer which updates the UI
         final Observer<MissingKid> detailKidObserver = new Observer<MissingKid>() {

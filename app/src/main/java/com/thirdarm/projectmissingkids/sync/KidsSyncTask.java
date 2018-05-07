@@ -16,10 +16,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
- * Fetch the latest Missing Kids data from the NCMEC database, and store in user's local database
+ * Fetch Missing Kids data from the NCMEC database, and store in user's local database
  */
 public class KidsSyncTask {
 
@@ -50,6 +51,7 @@ public class KidsSyncTask {
                 int numPages = NetworkUtils.getTotalPagesFromMetadata(searchResults);
                 for (int i = 1; i <= numPages; i++) {
                     // iterate through every page via an asynctask to fetch all pages and store into local db quickly and asynchronously
+                    // TODO: This loads up kids in an arbitrary order. Consider loading a sorted list
                     AsyncTask<Integer, Void, Void> sync = new AsyncTask<Integer, Void, Void>() {
                         @Override
                         protected Void doInBackground(Integer... integers) {
@@ -86,7 +88,6 @@ public class KidsSyncTask {
                 List<ChildData> childData = convertJSONArrayToChildData(searchResults);
 
                 // convert the ChildObjects into MissingKids
-                // TODO: Currently this replaces all detail data with null
                 List<MissingKid> missingKids = convertChildDataToMissingKid(childData);
                 // populate the database with the MissingKids
                 populateAsync(missingKids);
@@ -111,6 +112,7 @@ public class KidsSyncTask {
 
     /**
      * Converts a list of ChildData into a list of MissingKid data
+     * TODO: Currently this replaces all detail data with null
      *
      * @param childData The list of ChildData
      * @return The list of MissingKid data
@@ -131,17 +133,24 @@ public class KidsSyncTask {
      */
     private void populateAsync(List<MissingKid> missingKids) {
         MissingKidDao dao = mDb.missingKidDao();
+
+        // for debugging
         int numUpdated = 0;
         int numInserted = 0;
-        List<String> orgPrefixes = new ArrayList<>();
+        List<String> orgPrefixCaseNums = new ArrayList<>();
+
         for (MissingKid kid : missingKids) {
+            // for checking whether kid already exists in db
             MissingKid kidFromDb = dao.findKidByOrgPrefixCaseNum(kid.orgPrefixCaseNumber);
-            boolean check = orgPrefixes.contains(kid.orgPrefixCaseNumber);
+
+            // for debugging: checks for duplicate ids
+            boolean check = orgPrefixCaseNums.contains(kid.orgPrefixCaseNumber);
             if (check) {
-                Log.e(TAG, "Duplicate ID found!");
+                Log.w(TAG, "Duplicate ID found!");
             } else {
-                orgPrefixes.add(kid.orgPrefixCaseNumber);
+                orgPrefixCaseNums.add(kid.orgPrefixCaseNumber);
             }
+
             if (kidFromDb != null) {
                 // update kid only if it already exists in db
                 kid.uid = kidFromDb.uid;
@@ -154,5 +163,59 @@ public class KidsSyncTask {
         }
         Log.d(TAG, "Total number updated: " + numUpdated);
         Log.d(TAG, "Total number inserted: " + numInserted);
+    }
+
+    /**
+     * Fetches detail data for a single kid, then loads it into the user's local database.
+     * <p>
+     * Logs an error if there is no data returned from the server, or if there was something wrong
+     * with fetching the results
+     */
+    synchronized public void syncDetailDataFromOnline(final String caseNum, final String orgPrefix) {
+        AsyncTask<Void, Void, Void> sync = new AsyncTask<Void, Void, Void>() {
+            boolean success = false;
+
+            @Override
+            protected Void doInBackground(Void... voids) {
+                MissingKid completeKid = appendDetailDataWithPartialKid(caseNum, orgPrefix);
+                if (completeKid != null) {
+                    success = true;
+                } else {
+                    Log.e(TAG, "There was no data returned from the server.");
+                    return null;
+                }
+                List<MissingKid> kids = new ArrayList<>(Arrays.asList(completeKid));
+                populateAsync(kids);
+                return null;
+            }
+        };
+        sync.execute();
+    }
+
+    /**
+     * Helper method for appending detail data into partial kid data that already exists
+     *
+     * @param caseNumber
+     * @param orgPrefix
+     * @return
+     */
+    private static MissingKid appendDetailDataWithPartialKid(String caseNumber, String orgPrefix) {
+        MissingKid partialKidData = mDb.missingKidDao().findKidByOrgPrefixCaseNum(orgPrefix + caseNumber);
+        JSONObject detailChildJson = null;
+        try {
+            detailChildJson = NetworkUtils.getDetailDataJson(caseNumber, orgPrefix);
+            if (detailChildJson == null) {
+                // return null if there is no detailed data available. handle nulls accordingly
+                return null;
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.e(TAG, "There was a problem grabbing the detail data from the provided caseNumber ("
+                    + caseNumber + ") and orgPrefix (" + orgPrefix + ")");
+        }
+
+        ChildData detailChildData = DataParsingUtils.parseDetailDataForChild(detailChildJson, new ChildData());
+        MissingKid completeKidData = MissingKid.appendDetailChildDataWithPartialKidData(partialKidData, detailChildData);
+        return completeKidData;
     }
 }

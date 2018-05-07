@@ -22,6 +22,11 @@ public class KidsSyncUtils {
 
     /**
      * To be run only when the app is loaded. If the database is empty, load it with fresh data
+     * <p>
+     * TODO: Currently only enables refresh ONLY when database is empty. Figure out how to update
+     * automatically when database is "dirty", or outdated
+     * <p>
+     * Use {@link #syncDataWithServer(Context)} to force sync otherwise
      *
      * @param context
      */
@@ -59,6 +64,21 @@ public class KidsSyncUtils {
      */
     public static void syncDataWithServer(@NonNull final Context context) {
         Intent syncWithServer = new Intent(context, KidsSyncIntentService.class);
+        syncWithServer.setAction(KidsSyncIntentService.INTENT_ACTION_COMPLETE_SYNC);
+        context.startService(syncWithServer);
+    }
+
+    /**
+     * Helper method to call the service that would fetch a kid's detail data from server
+     * @param context
+     * @param caseNumber
+     * @param orgPrefix
+     */
+    public static void fetchDetailDataFromServer(@NonNull final Context context, String caseNumber, String orgPrefix) {
+        Intent syncWithServer = new Intent(context, KidsSyncIntentService.class);
+        syncWithServer.setAction(KidsSyncIntentService.INTENT_ACTION_SINGLE_DETAILS_SYNC);
+        syncWithServer.putExtra(KidsSyncIntentService.STRING_EXTRA_CASE_NUMBER, caseNumber);
+        syncWithServer.putExtra(KidsSyncIntentService.STRING_EXTRA_ORG_PREFIX, orgPrefix);
         context.startService(syncWithServer);
     }
 }
