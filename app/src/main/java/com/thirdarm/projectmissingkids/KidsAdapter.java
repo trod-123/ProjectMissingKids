@@ -80,6 +80,7 @@ public class KidsAdapter extends RecyclerView.Adapter<KidsAdapter.KidsAdapterVie
         if (kid.date.age > -1) {
             String age = Long.toString(kid.date.age);
             holder.ageView.setText("Age: " + age);
+            holder.ageView.setVisibility(View.VISIBLE);
         } else {
             holder.ageView.setVisibility(View.INVISIBLE);
         }
