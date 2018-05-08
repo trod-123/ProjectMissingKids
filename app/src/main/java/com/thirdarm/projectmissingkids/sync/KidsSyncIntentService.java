@@ -27,13 +27,13 @@ public class KidsSyncIntentService extends IntentService {
         if (action != null) {
             switch (action) {
                 case INTENT_ACTION_COMPLETE_SYNC:
-                    new KidsSyncTask(this).syncKidsFromOnline();
+                    new KidsSyncTasks(this).syncKidsFromOnline();
                     break;
                 case INTENT_ACTION_SINGLE_DETAILS_SYNC:
                     if (intent.hasExtra(STRING_EXTRA_CASE_NUMBER) && intent.hasExtra(STRING_EXTRA_ORG_PREFIX)) {
                         String caseNumber = intent.getStringExtra(STRING_EXTRA_CASE_NUMBER);
                         String orgPrefix = intent.getStringExtra(STRING_EXTRA_ORG_PREFIX);
-                        new KidsSyncTask(this).syncDetailDataFromOnline(caseNumber, orgPrefix);
+                        new KidsSyncTasks(this).syncDetailDataFromOnline(caseNumber, orgPrefix);
                     } else {
                         Log.w(TAG, "There were no caseNumber or orgPrefix provided. Will not sync.");
                     }

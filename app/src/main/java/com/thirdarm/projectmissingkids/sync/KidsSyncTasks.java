@@ -22,16 +22,16 @@ import java.util.List;
 /**
  * Fetch Missing Kids data from the NCMEC database, and store in user's local database
  */
-public class KidsSyncTask {
+public class KidsSyncTasks {
 
     /**
      * Tag for debugging
      */
-    private static final String TAG = KidsSyncTask.class.getSimpleName();
+    private static final String TAG = KidsSyncTasks.class.getSimpleName();
 
     private static MissingKidsDatabase mDb;
 
-    public KidsSyncTask(Context context) {
+    public KidsSyncTasks(Context context) {
         mDb = MissingKidsDatabase.getInstance(context);
     }
 
@@ -50,8 +50,7 @@ public class KidsSyncTask {
             if (searchResults != null) {
                 int numPages = NetworkUtils.getTotalPagesFromMetadata(searchResults);
                 for (int i = 1; i <= numPages; i++) {
-                    // iterate through every page via an asynctask to fetch all pages and store into local db quickly and asynchronously
-                    // TODO: This loads up kids in an arbitrary order. Consider loading a sorted list
+                    // iterate through every page via an asynctask to fetch all pages one at a time
                     AsyncTask<Integer, Void, Void> sync = new AsyncTask<Integer, Void, Void>() {
                         @Override
                         protected Void doInBackground(Integer... integers) {
@@ -59,7 +58,7 @@ public class KidsSyncTask {
                             return null;
                         }
                     };
-                    sync.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, i);
+                    sync.execute(i);
                 }
             } else {
                 Log.e(TAG, "There was no data returned from the server.");
