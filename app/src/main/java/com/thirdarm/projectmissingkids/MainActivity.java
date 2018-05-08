@@ -71,36 +71,6 @@ public class MainActivity extends AppCompatActivity implements
         subscribe();
     }
 
-    private class DiffUtilsCallbacks extends DiffUtil.Callback {
-
-        private List<MissingKid> oldList, newList;
-
-        public DiffUtilsCallbacks(List<MissingKid> oldList, List<MissingKid> newList) {
-            this.oldList = oldList;
-            this.newList = newList;
-        }
-
-        @Override
-        public int getOldListSize() {
-            return oldList != null ? oldList.size() : 0;
-        }
-
-        @Override
-        public int getNewListSize() {
-            return newList != null ? newList.size() : 0;
-        }
-
-        @Override
-        public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-            return oldList != null && newList != null && oldList.get(oldItemPosition).uid == newList.get(newItemPosition).uid;
-        }
-
-        @Override
-        public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-            return oldList != null && newList != null && oldList.get(oldItemPosition).name.equals(newList.get(newItemPosition).name);
-        }
-    }
-
     /**
      * Helper method to pair the UI observer with the ViewModel. The observer is used to monitor
      * changes to the list of missing kids. If the list changes, then the Observer's onChanged()
@@ -119,11 +89,8 @@ public class MainActivity extends AppCompatActivity implements
 
             @Override
             public void onChanged(@Nullable List<MissingKid> missingKids) {
-                DiffUtil.DiffResult result = DiffUtil.calculateDiff(new DiffUtilsCallbacks(kids, missingKids));
                 mKidsAdapter.swapList(missingKids);
-                result.dispatchUpdatesTo(mKidsAdapter);
                 kids = missingKids;
-                //mKidsAdapter.swapList(missingKids);
                 if (!visible) {
                     showView();
                     visible = true;
