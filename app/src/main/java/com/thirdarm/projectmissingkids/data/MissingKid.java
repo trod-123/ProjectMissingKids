@@ -16,9 +16,6 @@ import com.thirdarm.projectmissingkids.util.Tuple;
         indices = {@Index(value={"orgPrefixCaseNumber"}, unique = true)})
 public class MissingKid {
 
-    // TODO (1): Confirm necessity of fields and clean out unnecessary fields
-    // TODO (2): Fix all references to these fields if needed
-
     /**
      * Default constructor
      */
