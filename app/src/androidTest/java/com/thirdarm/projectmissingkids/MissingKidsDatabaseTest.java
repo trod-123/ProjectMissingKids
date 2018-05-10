@@ -77,7 +77,7 @@ public class MissingKidsDatabaseTest {
         assertEquals(kid.gender, kid2.gender);
         assertEquals(kid.hairColor, kid2.hairColor);
         assertEquals(kid.caseNum, kid2.caseNum);
-        assertEquals(kid.name.firstName, kid2.name.firstName);
+        assertEquals(kid.firstName, kid2.firstName);
     }
 
     /**
@@ -111,7 +111,7 @@ public class MissingKidsDatabaseTest {
                 assertEquals(kid.gender, gender);
                 assertEquals(kid.hairColor, hairColor);
                 assertEquals(kid.caseNum, ncmcId);
-                assertEquals(kid.name.firstName, firstName);
+                assertEquals(kid.firstName, firstName);
             }
             cursor.close();
         }

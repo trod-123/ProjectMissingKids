@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.thirdarm.projectmissingkids.data.ChildData;
 import com.thirdarm.projectmissingkids.data.MissingKid;
 import com.thirdarm.projectmissingkids.data.MissingKidDao;
 import com.thirdarm.projectmissingkids.data.MissingKidsDatabase;
@@ -54,7 +53,8 @@ public class KidsSyncTasks {
                     AsyncTask<Integer, Void, Void> sync = new AsyncTask<Integer, Void, Void>() {
                         @Override
                         protected Void doInBackground(Integer... integers) {
-                            syncFromIndividualPage(integers[0]);
+                            List<MissingKid> missingKids = syncFromIndividualPage(integers[0]);
+                            if (missingKids != null) storeKidsInLocalDb(missingKids);
                             return null;
                         }
                     };
@@ -71,25 +71,19 @@ public class KidsSyncTasks {
 
     /**
      * Helper method to sync and store data from individual Json response pages. First converts the
-     * search results into ChildObjects and MissingKid objects
+     * search results into MissingKid objects
      * <p>
      * Logs an error if there is no data returned from the server, or if there was something wrong
      * with fetching the results
      *
      * @param pageNum
      */
-    synchronized private void syncFromIndividualPage(int pageNum) {
+    synchronized private List<MissingKid> syncFromIndividualPage(int pageNum) {
         JSONArray searchResults;
         try {
             searchResults = NetworkUtils.getSearchResultPageJsonArray(pageNum);
             if (searchResults != null) {
-                // then convert the JSONArray into ChildObjects
-                List<ChildData> childData = convertJSONArrayToChildData(searchResults);
-
-                // convert the ChildObjects into MissingKids
-                List<MissingKid> missingKids = convertChildDataToMissingKid(childData);
-                // populate the database with the MissingKids
-                populateAsync(missingKids);
+                return DataParsingUtils.getMissingKidListFromJsonArray(searchResults);
             } else {
                 Log.e(TAG, "There was no data returned from the server.");
             }
@@ -97,32 +91,7 @@ public class KidsSyncTasks {
             e.printStackTrace();
             Log.e(TAG, "There was an error getting the search results");
         }
-    }
-
-    /**
-     * Converts the JSONArray data into a list of ChildData
-     *
-     * @param jsonData The json data
-     * @return The list of ChildData
-     */
-    private List<ChildData> convertJSONArrayToChildData(JSONArray jsonData) {
-        return DataParsingUtils.getChildDataListFromJsonArray(jsonData);
-    }
-
-    /**
-     * Converts a list of ChildData into a list of MissingKid data
-     * TODO: Currently this replaces all detail data with null
-     *
-     * @param childData The list of ChildData
-     * @return The list of MissingKid data
-     */
-    private List<MissingKid> convertChildDataToMissingKid(List<ChildData> childData) {
-        List<MissingKid> kids = new ArrayList<>(childData.size());
-        for (ChildData data : childData) {
-            MissingKid kid = MissingKid.convertFromPartialChildData(data);
-            kids.add(kid);
-        }
-        return kids;
+        return null;
     }
 
     /**
@@ -130,7 +99,7 @@ public class KidsSyncTasks {
      *
      * @param missingKids The list of MissingKids data
      */
-    private void populateAsync(List<MissingKid> missingKids) {
+    private void storeKidsInLocalDb(List<MissingKid> missingKids) {
         MissingKidDao dao = mDb.missingKidDao();
 
         // for debugging
@@ -172,19 +141,15 @@ public class KidsSyncTasks {
      */
     synchronized public void syncDetailDataFromOnline(final String caseNum, final String orgPrefix) {
         AsyncTask<Void, Void, Void> sync = new AsyncTask<Void, Void, Void>() {
-            boolean success = false;
-
             @Override
             protected Void doInBackground(Void... voids) {
                 MissingKid completeKid = appendDetailDataWithPartialKid(caseNum, orgPrefix);
-                if (completeKid != null) {
-                    success = true;
-                } else {
+                if (completeKid == null) {
                     Log.e(TAG, "There was no data returned from the server.");
                     return null;
                 }
                 List<MissingKid> kids = new ArrayList<>(Arrays.asList(completeKid));
-                populateAsync(kids);
+                storeKidsInLocalDb(kids);
                 return null;
             }
         };
@@ -213,8 +178,6 @@ public class KidsSyncTasks {
                     + caseNumber + ") and orgPrefix (" + orgPrefix + ")");
         }
 
-        ChildData detailChildData = DataParsingUtils.parseDetailDataForChild(detailChildJson, new ChildData());
-        MissingKid completeKidData = MissingKid.appendDetailChildDataWithPartialKidData(partialKidData, detailChildData);
-        return completeKidData;
-    }
+        return DataParsingUtils.parseDetailDataForMissingKid(detailChildJson, partialKidData);
+        }
 }

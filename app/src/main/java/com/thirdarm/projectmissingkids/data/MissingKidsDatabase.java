@@ -8,7 +8,7 @@ import android.content.Context;
 /**
  * The database object serves as the main access point to the app's persisted data
  */
-@Database(version = 2, entities = {MissingKid.class})
+@Database(version = 3, entities = {MissingKid.class})
 public abstract class MissingKidsDatabase extends RoomDatabase {
 
     private static MissingKidsDatabase INSTANCE;
@@ -24,7 +24,7 @@ public abstract class MissingKidsDatabase extends RoomDatabase {
     public static synchronized MissingKidsDatabase getInstance(Context context) {
         if (INSTANCE == null) {
             INSTANCE = Room.databaseBuilder(context.getApplicationContext(), MissingKidsDatabase.class, "missingKidsDatabase.db")
-                    .fallbackToDestructiveMigrationFrom(1)
+                    .fallbackToDestructiveMigrationFrom(2)
                     .build();
         }
         return INSTANCE;

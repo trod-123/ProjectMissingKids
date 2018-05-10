@@ -16,143 +16,143 @@ import com.thirdarm.projectmissingkids.util.Tuple;
         indices = {@Index(value={"orgPrefixCaseNumber"}, unique = true)})
 public class MissingKid {
 
-    /**
-     * Create a MissingKid object with partial data, but no detail data
-     * @param partialChildData
-     * @return
-     */
-    public static MissingKid convertFromPartialChildData(ChildData partialChildData) {
-        MissingKid partialKidData = new MissingKid();
-        partialKidData.caseNum = partialChildData.getCaseNumber();
-        partialKidData.orgPrefix = partialChildData.getOrgPrefix();
-        partialKidData.orgPrefixCaseNumber = partialKidData.orgPrefix + partialKidData.caseNum;
-        partialKidData.source = partialChildData.getOrgName();
-        partialKidData.originalPhotoUrl = partialChildData.getThumbnailURL();
-        partialKidData.race = partialChildData.getRace();
-
-        // name
-        partialKidData.name = new Name();
-        partialKidData.name.firstName = partialChildData.getFirstName();
-        partialKidData.name.middleName = partialChildData.getMiddleName();
-        partialKidData.name.lastName = partialChildData.getLastName();
-
-        // address
-        partialKidData.address = new Address();
-        partialKidData.address.locCity = partialChildData.getMissingCity();
-        partialKidData.address.locState = partialChildData.getMissingState();
-        partialKidData.address.locCountry = partialChildData.getMissingCountry();
-
-        partialKidData.date = new Date();
-        partialKidData.date.age = partialChildData.getAge();
-
-        // Approx age (ChildData regex: "lower-upper" e.g. "15-25")
-        String approxAgeRange = partialChildData.getApproxAge();
-        if (!approxAgeRange.equals("")) {
-            Tuple<Integer, Integer> ageRange = GeneralUtils.convertStringNumberRangeToInts(approxAgeRange);
-            partialKidData.date.estAgeLower = ageRange.x;
-            partialKidData.date.estAgeHigher = ageRange.y;
-        }
-
-        // missing date
-        if (partialChildData.getMissingDate() != null) {
-            java.util.Date missingDate = partialChildData.getMissingDate();
-            partialKidData.date.dateMissing = missingDate.getTime();
-        }
-
-        return partialKidData;
-    }
-
-    /**
-     * Create a MissingKid object with detail data, but no partial data
-     * @param detailChildData
-     * @return
-     */
-    public static MissingKid convertFromDetailChildData(ChildData detailChildData) {
-        MissingKid detailKidData = new MissingKid();
-
-        // descriptions
-        detailKidData.gender = detailChildData.getSex();
-        detailKidData.race = detailChildData.getRace();
-        detailKidData.description = detailChildData.getCircumstance();
-        detailKidData.eyeColor = detailChildData.getEyeColor();
-        detailKidData.hairColor = detailChildData.getHairColor();
-
-        // date of birth
-        detailKidData.date = new Date();
-        if (detailChildData.getBirthDate() != null) {
-            java.util.Date birthDate = detailChildData.getBirthDate();
-            detailKidData.date.dateOfBirth = birthDate.getTime();
-        }
-
-        // Height
-        detailKidData.height = new Height();
-        detailKidData.height.heightImperial = detailChildData.getHeight();
-
-        // Weight
-        detailKidData.weight = new Weight();
-        detailKidData.weight.weightImperial = detailChildData.getWeight();
-
-        return detailKidData;
-    }
-
-    /**
-     * Create a MissingKid object with full ChildData, with detail ChildData
-     * @param fullChildData
-     * @return
-     */
-    public static MissingKid convertFromFullChildData(ChildData fullChildData) {
-        // Get partialKidData
-        MissingKid partialKidData = convertFromPartialChildData(fullChildData);
-        // Get detailKidData
-        MissingKid detailKidData = convertFromDetailChildData(fullChildData);
-        // merge the kid data
-        return mergePartialDetailMissingKidData(partialKidData, detailKidData);
-    }
-
-    /**
-     * Merge partial and detail MissingKid data into one complete MissingKid object
-     * @param partialKidData
-     * @param detailKidData
-     * @return
-     */
-    public static MissingKid mergePartialDetailMissingKidData(MissingKid partialKidData, MissingKid detailKidData) {
-        MissingKid completeKidData = partialKidData;
-
-        // descriptions
-        completeKidData.gender = detailKidData.gender;
-        completeKidData.race = detailKidData.race;
-        completeKidData.description = detailKidData.description;
-        completeKidData.eyeColor = detailKidData.eyeColor;
-        completeKidData.hairColor = detailKidData.hairColor;
-
-        completeKidData.date.dateOfBirth = detailKidData.date.dateOfBirth;
-
-        // Height stuff
-        completeKidData.height = new Height();
-        completeKidData.height.heightImperial = detailKidData.height.heightImperial;
-
-        // Weight stuff
-        completeKidData.weight = new Weight();
-        completeKidData.weight.weightImperial = detailKidData.weight.weightImperial;
-
-        return completeKidData;
-    }
-
-    /**
-     * Append detail ChildData with partial MissingKid data into one complete MissingKid object
-     * @param detailChildData
-     * @param partialKidData
-     * @return
-     */
-    public static MissingKid appendDetailChildDataWithPartialKidData(MissingKid partialKidData, ChildData detailChildData) {
-        MissingKid detailKidData = convertFromDetailChildData(detailChildData);
-        return mergePartialDetailMissingKidData(partialKidData, detailKidData);
-    }
+    // TODO (1): Confirm necessity of fields and clean out unnecessary fields
+    // TODO (2): Fix all references to these fields if needed
+    // TODO (3): Remove "Embedded" classes. We don't need these anymore
+    // TODO (4): Remove ChildData class after confirming we don't need it
+    // TODO (5): Reflect the dropped ChildData class in the SyncUtils
 
     /**
      * Default constructor
      */
     public MissingKid() {
+    }
+
+    /**
+     * Create a MissingKid object out of the preview data
+     *
+     * @param caseNumber
+     * @param orgPrefix
+     * @param orgName
+     * @param isChild
+     * @param seqNumber
+     * @param langId
+     * @param firstName
+     * @param lastName
+     * @param middleName
+     * @param missingCity
+     * @param missingCounty
+     * @param missingState
+     * @param missingCountry
+     * @param missingDate
+     * @param age
+     * @param inMonth
+     * @param inDay
+     * @param approxAge
+     * @param hasThumbnail
+     * @param hasPoster
+     * @param thumbnailURL
+     * @param caseType
+     * @param posterTitle
+     * @param race
+     */
+    public MissingKid(String caseNumber, String orgPrefix, String orgName, boolean isChild,
+                     int seqNumber, String langId, String firstName, String lastName,
+                     String middleName, String missingCity, String missingCounty,
+                     String missingState, String missingCountry, java.util.Date missingDate, int age,
+                     boolean inMonth, boolean inDay, String approxAge, boolean hasThumbnail,
+                     boolean hasPoster, String thumbnailURL, String caseType, String posterTitle,
+                     String race) {
+        this.caseNum = caseNumber;
+        this.orgPrefix = orgPrefix;
+        this.orgPrefixCaseNumber = orgPrefix + caseNumber;
+        this.source = orgName;
+        //this.isChild = isChild;
+        //this.seqNumber = seqNumber;
+        //this.langId = langId;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.middleName = middleName;
+        this.locCity = missingCity;
+        //this.missingCounty = missingCounty;
+        this.locState = missingState;
+        this.locCountry= missingCountry;
+        if (missingDate != null) {
+            this.dateMissing = missingDate.getTime();
+        }
+        this.age = age;
+        //this.inMonth = inMonth;
+        //this.inDay = inDay;
+        if (!approxAge.equals("")) {
+            Tuple<Integer, Integer> ageRange = GeneralUtils.convertStringNumberRangeToInts(approxAge);
+            this.estAgeLower = ageRange.x;
+            this.estAgeHigher = ageRange.y;
+        }
+        //this.hasThumbnail = hasThumbnail;
+        //this.hasPoster = hasPoster;
+        this.originalPhotoUrl = thumbnailURL;
+        //this.caseType = caseType;
+        //this.posterTitle = posterTitle;
+        this.race = race;
+    }
+
+    /**
+     * Append detail data to the called MissingKid object
+     *
+     * @param hasAgedPhoto
+     * @param hasExtraPhoto
+     * @param possibleLocation
+     * @param sex
+     * @param race
+     * @param birthDate
+     * @param height
+     * @param heightInInch
+     * @param weight
+     * @param weightInPound
+     * @param eyeColor
+     * @param hairColor
+     * @param hasPhoto
+     * @param missingProvince
+     * @param circumstance
+     * @param profileNarrative
+     * @param orgContactInfo
+     * @param orgLogo
+     * @param isClearinghouse
+     * @param repSightURL
+     * @param altContact
+     * @param photoMap
+     */
+    public void addDetailData(boolean hasAgedPhoto, boolean hasExtraPhoto, String possibleLocation,
+                              String sex, String race, java.util.Date birthDate, int height, boolean heightInInch,
+                              int weight, boolean weightInPound, String eyeColor, String hairColor,
+                              boolean hasPhoto, String missingProvince, String circumstance,
+                              String profileNarrative, String orgContactInfo, String orgLogo,
+                              boolean isClearinghouse, String repSightURL, String altContact,
+                              String photoMap) {
+        //this.hasAgedPhoto = hasAgedPhoto;
+        //this.hasExtraPhoto = hasExtraPhoto;
+        //this.possibleLocation = possibleLocation;
+        this.gender = sex;
+        this.race = race;
+        if (birthDate != null) {
+            this.dateOfBirth = birthDate.getTime();
+        }
+        this.heightImperial = height;
+        //this.heightInInch = heightInInch;
+        this.weightImperial = weight;
+        //this.weightInPound = weightInPound;
+        this.eyeColor = eyeColor;
+        this.hairColor = hairColor;
+        //this.hasPhoto = hasPhoto;
+        //this.missingProvince = missingProvince;
+        this.description = circumstance;
+        //this.profileNarrative = profileNarrative;
+        //this.orgContactInfo = orgContactInfo;
+        //this.orgLogo = orgLogo;
+        //this.isClearinghouse = isClearinghouse;
+        //this.repSightURL = repSightURL;
+        //this.altContact = altContact;
+        //this.photoMap = photoMap;
     }
 
     /**
@@ -198,19 +198,84 @@ public class MissingKid {
 //    @ColumnInfo(name = "associated_ncms_ids")
 //    public long[] associatedNCMSids;
 
-    @Embedded
-    public Name name;
-
-    @Embedded
-    public Date date;
-
-    @Embedded
-    public Address address;
+    /**
+     * Child's first name (String)
+     */
+    @ColumnInfo(name = "first_name")
+    public String firstName;
 
     /**
-     *  Url linking to detailed information about child (String)
-     *  (this can be generated using "api.missingkids.org/poster/NCMC/[ncmec_id]", CP entry may not be needed)
+     * Child's middle name, if any (String)
      */
+    @ColumnInfo(name = "middle_name")
+    public String middleName;
+
+    /**
+     * Child's last name (String)
+     */
+    @ColumnInfo(name = "last_name")
+    public String lastName;
+
+    /**
+     * UTC date missing (long)
+     */
+    @ColumnInfo(name = "date_missing")
+    public long dateMissing;
+
+    /**
+     * UTC date found (long)
+     * Only provided for specific statuses (e.g. Unidentified Child)
+     */
+    @ColumnInfo(name = "date_found")
+    public long dateFound;
+
+    /**
+     * Date of birth (long)
+     */
+    @ColumnInfo(name = "date_of_birth")
+    public long dateOfBirth;
+
+    /**
+     * Age (int)
+     */
+    public int age;
+
+    /**
+     * Estimated age (for where DOB is not provided) (int): lower bound
+     * Only provided for specific statuses (e.g. Unidentified Child)
+     */
+    @ColumnInfo(name = "est_age_lower")
+    public int estAgeLower;
+
+    /**
+     * Estimated age (for where DOB is not provided) (int): upper bound
+     * Only provided for specific statuses (e.g. Unidentified Child)
+     */
+    @ColumnInfo(name = "est_age_higher")
+    public int estAgeHigher;
+
+    /**
+     * State location from which child is missing or found. Stored as the ANSI 2-letter abbreviation  (String)
+     */
+    @ColumnInfo(name = "loc_state")
+    public String locState;
+
+    /**
+     * City location from which child is missing or found (String)
+     */
+    @ColumnInfo(name = "loc_city")
+    public String locCity;
+
+    /**
+     * Country location from which child is missing or found. Stored as 2-letter country code, based on ISO 3166-1 alpha-2 (String)
+     */
+    @ColumnInfo(name = "loc_country")
+    public String locCountry;
+
+/**
+ *  Url linking to detailed information about child (String)
+ *  (this can be generated using "api.missingkids.org/poster/NCMC/[ncmec_id]", CP entry may not be needed)
+ */
     @ColumnInfo(name = "poster_url")
     public String posterUrl;
 
@@ -266,11 +331,57 @@ public class MissingKid {
     @ColumnInfo(name = "eye_color")
     public String eyeColor;
 
-    @Embedded
-    public Height height;
+    /**
+     *  Child's height, in imperial units (inches) (double)
+     */
+    @ColumnInfo(name = "height_imperial")
+    public double heightImperial;
 
-    @Embedded
-    public Weight weight;
+    /**
+     *  Child's height, in metric units (meters) (double)
+     */
+    @ColumnInfo(name = "height_metric")
+    public double heightMetric;
+
+    /**
+     *  Estimated height, in imperial units (inches): lower bound (double)
+     *  Only provided for specific statuses (e.g. Unidentified Child)
+     */
+    @ColumnInfo(name = "est_height_imperial_lower")
+    public double estHeightImperialLower;
+
+    /**
+     *  Estimated height, in imperial units (inches): upper bound (double)
+     *  Only provided for specific statuses (e.g. Unidentified Child)
+     */
+    @ColumnInfo(name = "est_height_imperial_higher")
+    public double estHeightImperialHigher;
+
+    /**
+     *  Estimated height, in metric units (meters): lower bound (double)
+     *  Only provided for specific statuses (e.g. Unidentified Child)
+     */
+    @ColumnInfo(name = "est_height_metric_lower")
+    public double estHeightMetricLower;
+
+    /**
+     *  Estimated height, in metric units (meters): upper bound (double)
+     *  Only provided for specific statuses (e.g. Unidentified Child)
+     */
+    @ColumnInfo(name = "est_height_metric_higher")
+    public double estHeightMetricHigher;
+
+    /**
+     * Child's weight, in imperial units (pounds) (double)
+     */
+    @ColumnInfo(name = "weight_imperial")
+    public double weightImperial;
+
+    /**
+     * Child's weight, in metric units (kilograms) (double)
+     */
+    @ColumnInfo(name = "weight_metric")
+    public double weightMetric;
 
     /**
      *  Information source (usually it's "National Center for Missing & Exploited Children", but can also be "NCMEC-Unidentified" if child status is "Unidentified")

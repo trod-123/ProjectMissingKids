@@ -3,7 +3,7 @@ package com.thirdarm.projectmissingkids.util;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.thirdarm.projectmissingkids.data.ChildData;
+import com.thirdarm.projectmissingkids.data.MissingKid;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -27,7 +27,7 @@ public class DataParsingUtils {
     private static final String CASE_NUMBER = "caseNumber";
     private static final String ORG_PREFIX = "orgPrefix";
     private static final String ORG_NAME = "orgName";
-    private static final String IS_CHILD = "isChild";
+    private static final String IS_MissingKid = "isMissingKid";
     private static final String SEQ_NUMBER = "seqNumber";
     private static final String LANG_ID = "langId";
     private static final String FIRST_NAME = "firstName";
@@ -73,18 +73,18 @@ public class DataParsingUtils {
     private static DateFormat formatter = new SimpleDateFormat("MMM dd, yyyy hh:mm:ss a");
 
     /**
-     * Converts a JSONArray of child data returned by NetworkUtils.getSearchResultsDataJsonArray()
-     * into a List of ChildData objects.
+     * Converts a JSONArray returned by NetworkUtils.getSearchResultsDataJsonArray()
+     * into a List of MissingKid objects.
      *
-     * @param dataJson a JSONArray of child data
-     * @return a List of ChildData objects parsed from the JSONArray
+     * @param dataJson a JSONArray of MissingKid data
+     * @return a List of MissingKid objects parsed from the JSONArray
      */
-    public static List<ChildData> getChildDataListFromJsonArray(JSONArray dataJson) {
-        ArrayList<ChildData> dataList = new ArrayList<>(dataJson.length());
+    public static List<MissingKid> getMissingKidListFromJsonArray(JSONArray dataJson) {
+        ArrayList<MissingKid> dataList = new ArrayList<>(dataJson.length());
         for (int i = 0; i < dataJson.length(); i++) {
             try {
-                JSONObject childDataJson = dataJson.getJSONObject(i);
-                dataList.add(parseChildDataFromJson(childDataJson));
+                JSONObject missingKidJson = dataJson.getJSONObject(i);
+                dataList.add(parseMissingKidDataFromJson(missingKidJson));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -93,26 +93,27 @@ public class DataParsingUtils {
     }
 
     /**
-     * Parses a single JSONObject of child data from a search into a ChildData object.
-     * @param childJson the JSONObject to be parsed
-     * @return the resulting ChildData object
+     * Parses a single JSONObject of MissingKid data from a search into a MissingKid object.
+     *
+     * @param missingKidJson the JSONObject to be parsed
+     * @return the resulting missingKid object
      * @throws JSONException if there was a problem parsing the data
      */
-    public static ChildData parseChildDataFromJson(JSONObject childJson) throws JSONException {
-        String caseNumber = childJson.getString(CASE_NUMBER);
-        String orgPrefix = childJson.getString(ORG_PREFIX);
-        String orgName = childJson.optString(ORG_NAME);
-        boolean isChild = childJson.optBoolean(IS_CHILD);
-        int seqNumber = childJson.optInt(SEQ_NUMBER);
-        String langId = childJson.optString(LANG_ID);
-        String firstName = childJson.optString(FIRST_NAME);
-        String lastName = childJson.optString(LAST_NAME);
-        String middleName = childJson.optString(MIDDLE_NAME);
-        String missingCity = childJson.optString(MISSING_CITY);
-        String missingCounty = childJson.optString(MISSING_COUNTY);
-        String missingState = childJson.optString(MISSING_STATE);
-        String missingCountry = childJson.optString(MISSING_COUNTRY);
-        String missingDateStr = childJson.optString(MISSING_DATE);
+    public static MissingKid parseMissingKidDataFromJson(JSONObject missingKidJson) throws JSONException {
+        String caseNumber = missingKidJson.getString(CASE_NUMBER);
+        String orgPrefix = missingKidJson.getString(ORG_PREFIX);
+        String orgName = missingKidJson.optString(ORG_NAME);
+        boolean isMissingKid = missingKidJson.optBoolean(IS_MissingKid);
+        int seqNumber = missingKidJson.optInt(SEQ_NUMBER);
+        String langId = missingKidJson.optString(LANG_ID);
+        String firstName = missingKidJson.optString(FIRST_NAME);
+        String lastName = missingKidJson.optString(LAST_NAME);
+        String middleName = missingKidJson.optString(MIDDLE_NAME);
+        String missingCity = missingKidJson.optString(MISSING_CITY);
+        String missingCounty = missingKidJson.optString(MISSING_COUNTY);
+        String missingState = missingKidJson.optString(MISSING_STATE);
+        String missingCountry = missingKidJson.optString(MISSING_COUNTRY);
+        String missingDateStr = missingKidJson.optString(MISSING_DATE);
         Date missingDate = null;
         try {
             if (!TextUtils.isEmpty(missingDateStr)) {
@@ -121,38 +122,38 @@ public class DataParsingUtils {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        int age = childJson.optInt(AGE);
-        boolean inMonth = childJson.optBoolean(IN_MONTH);
-        boolean inDay = childJson.optBoolean(IN_DAY);
-        String approxAge = childJson.optString(APPROX_AGE);
-        boolean hasThumbnail = childJson.optBoolean(HAS_THUMBNAIL);
-        boolean hasPoster = childJson.optBoolean(HAS_POSTER);
-        String thumbnailUrl = childJson.optString(THUMBNAIL_URL);
-        String caseType = childJson.optString(CASE_TYPE);
-        String posterTitle = childJson.optString(POSTER_TITLE);
-        String race = childJson.optString(RACE);
-        return new ChildData(caseNumber, orgPrefix, orgName, isChild, seqNumber,
+        int age = missingKidJson.optInt(AGE);
+        boolean inMonth = missingKidJson.optBoolean(IN_MONTH);
+        boolean inDay = missingKidJson.optBoolean(IN_DAY);
+        String approxAge = missingKidJson.optString(APPROX_AGE);
+        boolean hasThumbnail = missingKidJson.optBoolean(HAS_THUMBNAIL);
+        boolean hasPoster = missingKidJson.optBoolean(HAS_POSTER);
+        String thumbnailUrl = missingKidJson.optString(THUMBNAIL_URL);
+        String caseType = missingKidJson.optString(CASE_TYPE);
+        String posterTitle = missingKidJson.optString(POSTER_TITLE);
+        String race = missingKidJson.optString(RACE);
+        return new MissingKid(caseNumber, orgPrefix, orgName, isMissingKid, seqNumber,
                 langId, firstName, lastName, middleName, missingCity, missingCounty, missingState,
                 missingCountry, missingDate, age, inMonth, inDay, approxAge, hasThumbnail,
                 hasPoster, thumbnailUrl, caseType, posterTitle, race);
     }
 
     /**
-     * Parses the detail data for a child and adds it to the ChildData object for that child
+     * Parses the detail data for a MissingKid and adds it to the missingKid object for that MissingKid
      *
-     * @param childJson the JSONObject containing the detail data to be parsed
-     * @param childData the ChildData object to add the detail data to
-     * @return the ChildData with the added detail data
+     * @param missingKidJson the JSONObject containing the detail data to be parsed
+     * @param missingKid the missingKid object to add the detail data to
+     * @return the missingKid with the added detail data
      */
-    public static ChildData parseDetailDataForChild(JSONObject childJson, ChildData childData) {
-        Log.d(TAG, "childJson: " + childJson.toString());
-        // TODO check to see if the detail data is for the same case number as the ChildData
-        boolean hasAgedPhoto = childJson.optBoolean(HAS_AGED_PHOTO);
-        boolean hasExtraPhoto = childJson.optBoolean(HAS_EXTRA_PHOTO);
-        String possibleLocation = childJson.optString(POSSIBLE_LOCATION);
-        String sex = childJson.optString(SEX);
-        String race = childJson.optString(RACE);
-        String birthDateStr = childJson.optString(BIRTH_DATE);
+    public static MissingKid parseDetailDataForMissingKid(JSONObject missingKidJson, MissingKid missingKid) {
+        Log.d(TAG, "missingKidJson: " + missingKidJson.toString());
+        // TODO check to see if the detail data is for the same case number as the missingKid
+        boolean hasAgedPhoto = missingKidJson.optBoolean(HAS_AGED_PHOTO);
+        boolean hasExtraPhoto = missingKidJson.optBoolean(HAS_EXTRA_PHOTO);
+        String possibleLocation = missingKidJson.optString(POSSIBLE_LOCATION);
+        String sex = missingKidJson.optString(SEX);
+        String race = missingKidJson.optString(RACE);
+        String birthDateStr = missingKidJson.optString(BIRTH_DATE);
         Date birthDate = null;
         try {
             if (!TextUtils.isEmpty(birthDateStr)) {
@@ -161,26 +162,26 @@ public class DataParsingUtils {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        int height = childJson.optInt(HEIGHT);
-        boolean heightInInch = childJson.optBoolean(HEIGHT_IN_INCH);
-        int weight = childJson.optInt(WEIGHT);
-        boolean weightInPound = childJson.optBoolean(WEIGHT_IN_POUND);
-        String eyeColor = childJson.optString(EYE_COLOR);
-        String hairColor = childJson.optString(HAIR_COLOR);
-        boolean hasPhoto = childJson.optBoolean(HAS_PHOTO);
-        String missingProvince = childJson.optString(MISSING_PROVINCE);
-        String circumstance = childJson.optString(CIRCUMSTANCE);
-        String profileNarrative = childJson.optString(PROFILE_NARRATIVE);
-        String orgContactInfo = childJson.optString(ORG_CONTACT_INFO);
-        String orgLogo = childJson.optString(ORG_LOGO);
-        boolean isClearinghouse = childJson.optBoolean(IS_CLEARINGHOUSE);
-        String repSightURL = childJson.optString(REP_SIGHT_URL);
-        String altContact = childJson.optString(ALT_CONTACT);
-        String photoMap = childJson.optString(PHOTO_MAP);
-        childData.addDetailData(hasAgedPhoto, hasExtraPhoto, possibleLocation, sex, race, birthDate,
+        int height = missingKidJson.optInt(HEIGHT);
+        boolean heightInInch = missingKidJson.optBoolean(HEIGHT_IN_INCH);
+        int weight = missingKidJson.optInt(WEIGHT);
+        boolean weightInPound = missingKidJson.optBoolean(WEIGHT_IN_POUND);
+        String eyeColor = missingKidJson.optString(EYE_COLOR);
+        String hairColor = missingKidJson.optString(HAIR_COLOR);
+        boolean hasPhoto = missingKidJson.optBoolean(HAS_PHOTO);
+        String missingProvince = missingKidJson.optString(MISSING_PROVINCE);
+        String circumstance = missingKidJson.optString(CIRCUMSTANCE);
+        String profileNarrative = missingKidJson.optString(PROFILE_NARRATIVE);
+        String orgContactInfo = missingKidJson.optString(ORG_CONTACT_INFO);
+        String orgLogo = missingKidJson.optString(ORG_LOGO);
+        boolean isClearinghouse = missingKidJson.optBoolean(IS_CLEARINGHOUSE);
+        String repSightURL = missingKidJson.optString(REP_SIGHT_URL);
+        String altContact = missingKidJson.optString(ALT_CONTACT);
+        String photoMap = missingKidJson.optString(PHOTO_MAP);
+        missingKid.addDetailData(hasAgedPhoto, hasExtraPhoto, possibleLocation, sex, race, birthDate,
                 height, heightInInch, weight, weightInPound, eyeColor, hairColor, hasPhoto,
                 missingProvince, circumstance, profileNarrative, orgContactInfo, orgLogo,
                 isClearinghouse, repSightURL, altContact, photoMap);
-        return childData;
+        return missingKid;
     }
 }

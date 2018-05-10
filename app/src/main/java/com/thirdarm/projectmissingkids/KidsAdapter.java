@@ -61,9 +61,9 @@ public class KidsAdapter extends RecyclerView.Adapter<KidsAdapter.KidsAdapterVie
         /********
          * NAME *
          ********/
-        String name = kid.name.firstName + " " +
-                        kid.name.middleName + " " +
-                        kid.name.lastName;
+        String name = kid.firstName + " " +
+                        kid.middleName + " " +
+                        kid.lastName;
 
         // Below gets rid of double spaces if there's no middle name
         String formatedName = name.replaceAll("\\s{2,}", " ").trim();
@@ -77,8 +77,8 @@ public class KidsAdapter extends RecyclerView.Adapter<KidsAdapter.KidsAdapterVie
         /*******
          * AGE *
          *******/
-        if (kid.date.age > -1) {
-            String age = Long.toString(kid.date.age);
+        if (kid.age > -1) {
+            String age = Long.toString(kid.age);
             holder.ageView.setText("Age: " + age);
             holder.ageView.setVisibility(View.VISIBLE);
         } else {
@@ -88,16 +88,16 @@ public class KidsAdapter extends RecyclerView.Adapter<KidsAdapter.KidsAdapterVie
         /****************
          * MISSING DATE *
          ****************/
-        long millisecond2 = kid.date.dateMissing;
+        long millisecond2 = kid.dateMissing;
         String missingDateString = DateFormat.format("MMM dd, yyyy", new Date(millisecond2)).toString();
         holder.missingDateView.setText("Missing: " + missingDateString);
 
         /************
          * LOCATION *
          ************/
-        String location = kid.address.locCity + ", " +
-                            kid.address.locState + ", " +
-                            kid.address.locCountry + " ";
+        String location = kid.locCity + ", " +
+                            kid.locState + ", " +
+                            kid.locCountry + " ";
         holder.locationView.setText("Location: " + location);
     }
 

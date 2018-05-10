@@ -88,12 +88,12 @@ public class DetailActivity extends AppCompatActivity {
         /** Kid Name */
 
         // App bar shows kid's first name
-        if (data.name.firstName != null) {
-            getSupportActionBar().setTitle(data.name.firstName);
+        if (data.firstName != null) {
+            getSupportActionBar().setTitle(data.firstName);
 
-            String name = data.name.firstName + " " +
-                    data.name.middleName + " " +
-                    data.name.lastName;
+            String name = data.firstName + " " +
+                    data.middleName + " " +
+                    data.lastName;
 
             // Below gets rid of double spaces if there's no middle name
             String formatedName = name.replaceAll("\\s{2,}", " ").trim();
@@ -106,31 +106,31 @@ public class DetailActivity extends AppCompatActivity {
         }
 
         /** Missing Since */
-        if (data.date.dateMissing != -1L) {
-            long millisecond = data.date.dateMissing;
+        if (data.dateMissing != -1L) {
+            long millisecond = data.dateMissing;
             String missingDateString = DateFormat.format("MMM dd, yyyy", new Date(millisecond)).toString();
             mDetailDataBinding.extraDetails.missingSinceDate.setText(missingDateString);
         }
 
-        if (data.address.locCity != null) {
+        if (data.locCity != null) {
             /** Missing From */
-            String location = data.address.locCity + ", " +
-                    data.address.locState + ", " +
-                    data.address.locCountry;
+            String location = data.locCity + ", " +
+                    data.locState + ", " +
+                    data.locCountry;
 
             mDetailDataBinding.extraDetails.missingFromLocation.setText(location);
         }
 
         /** DOB */
-        if (data.date.dateOfBirth != -1L) {
-            long millisecond2 = data.date.dateOfBirth;
+        if (data.dateOfBirth != -1L) {
+            long millisecond2 = data.dateOfBirth;
             String dobDateString = DateFormat.format("MMM dd, yyyy", new Date(millisecond2)).toString();
             mDetailDataBinding.extraDetails.dobDate.setText(dobDateString);
         }
 
         /** Age Now */
-        if (data.date.age != -1) {
-            mDetailDataBinding.extraDetails.ageNumber.setText(String.valueOf(data.date.age));
+        if (data.age != -1) {
+            mDetailDataBinding.extraDetails.ageNumber.setText(String.valueOf(data.age));
         }
 
         /** Sex */
@@ -154,8 +154,8 @@ public class DetailActivity extends AppCompatActivity {
         }
 
         /** Height */
-        if (data.height != null) {
-            double height = data.height.heightImperial;
+        if (data.heightImperial != 0) {
+            double height = data.heightImperial;
             String heightImperial;
             if (height > 24) {
                 int inch = (int) Math.round(height % 12);
@@ -169,8 +169,8 @@ public class DetailActivity extends AppCompatActivity {
         }
 
         /** Weight */
-        if (data.weight != null) {
-            int roundedWeight = (int) Math.round(data.weight.weightImperial);
+        if (data.weightImperial != 0) {
+            int roundedWeight = (int) Math.round(data.weightImperial);
             String weightImperial = String.valueOf(roundedWeight) + " lbs";
             mDetailDataBinding.extraDetails.weightValue.setText(String.valueOf(weightImperial));
         }
