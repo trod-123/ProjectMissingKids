@@ -18,9 +18,6 @@ public class MissingKid {
 
     // TODO (1): Confirm necessity of fields and clean out unnecessary fields
     // TODO (2): Fix all references to these fields if needed
-    // TODO (3): Remove "Embedded" classes. We don't need these anymore
-    // TODO (4): Remove ChildData class after confirming we don't need it
-    // TODO (5): Reflect the dropped ChildData class in the SyncUtils
 
     /**
      * Default constructor
@@ -177,22 +174,6 @@ public class MissingKid {
     public String orgPrefixCaseNumber;
 
     /**
-     *  National Crime Information Center (NCIC) id (String)
-     *  <p>
-     *  Only provided for specific statuses (e.g. Unidentified Child)
-     */
-    @ColumnInfo(name = "ncic_id")
-    public String ncicId;
-
-    /**
-     *  National Missing and Unidentified Persons System (NAMUS) (String)
-     *  <p>
-     *  Only provided for specific statuses (e.g. Unidentified Child)
-     */
-    @ColumnInfo(name = "namus_id")
-    public String namusId;
-
-    /**
      *  List of associated NCMS ids (e.g. abductors) (long array)
      */
 //    @ColumnInfo(name = "associated_ncms_ids")
@@ -221,13 +202,6 @@ public class MissingKid {
      */
     @ColumnInfo(name = "date_missing")
     public long dateMissing;
-
-    /**
-     * UTC date found (long)
-     * Only provided for specific statuses (e.g. Unidentified Child)
-     */
-    @ColumnInfo(name = "date_found")
-    public long dateFound;
 
     /**
      * Date of birth (long)
@@ -338,12 +312,6 @@ public class MissingKid {
     public double heightImperial;
 
     /**
-     *  Child's height, in metric units (meters) (double)
-     */
-    @ColumnInfo(name = "height_metric")
-    public double heightMetric;
-
-    /**
      *  Estimated height, in imperial units (inches): lower bound (double)
      *  Only provided for specific statuses (e.g. Unidentified Child)
      */
@@ -358,30 +326,10 @@ public class MissingKid {
     public double estHeightImperialHigher;
 
     /**
-     *  Estimated height, in metric units (meters): lower bound (double)
-     *  Only provided for specific statuses (e.g. Unidentified Child)
-     */
-    @ColumnInfo(name = "est_height_metric_lower")
-    public double estHeightMetricLower;
-
-    /**
-     *  Estimated height, in metric units (meters): upper bound (double)
-     *  Only provided for specific statuses (e.g. Unidentified Child)
-     */
-    @ColumnInfo(name = "est_height_metric_higher")
-    public double estHeightMetricHigher;
-
-    /**
      * Child's weight, in imperial units (pounds) (double)
      */
     @ColumnInfo(name = "weight_imperial")
     public double weightImperial;
-
-    /**
-     * Child's weight, in metric units (kilograms) (double)
-     */
-    @ColumnInfo(name = "weight_metric")
-    public double weightMetric;
 
     /**
      *  Information source (usually it's "National Center for Missing & Exploited Children", but can also be "NCMEC-Unidentified" if child status is "Unidentified")
