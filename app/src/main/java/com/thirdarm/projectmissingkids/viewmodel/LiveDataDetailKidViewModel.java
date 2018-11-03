@@ -22,7 +22,7 @@ public class LiveDataDetailKidViewModel extends ViewModel {
      * @param db The Database from which to retrieve the kid
      */
     public void loadKidDetailsFromLocalDbAsync(MissingKidsDatabase db, String orgPrefixCaseNum) {
-        mLiveKid = db.missingKidDao().findKidByOrgPrefixCaseNumSync(orgPrefixCaseNum);
+        mLiveKid = db.missingKidDao().getKidByOrgPrefixCaseNumSync(orgPrefixCaseNum);
     }
 
     /**

@@ -24,7 +24,7 @@ public class LiveDataKidsListViewModel extends ViewModel {
      * @param db The Database from which to retrieve the mKidsList
      */
     public void loadKidsFromLocalDbAsync(MissingKidsDatabase db) {
-        mKidsList = db.missingKidDao().loadAllKidsSync();
+        mKidsList = db.missingKidDao().getAllKids();
     }
 
     /**

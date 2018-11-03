@@ -99,7 +99,7 @@ public class DataParsingUtils {
      * @return the resulting missingKid object
      * @throws JSONException if there was a problem parsing the data
      */
-    public static MissingKid parseMissingKidDataFromJson(JSONObject missingKidJson) throws JSONException {
+    private static MissingKid parseMissingKidDataFromJson(JSONObject missingKidJson) throws JSONException {
         String caseNumber = missingKidJson.getString(CASE_NUMBER);
         String orgPrefix = missingKidJson.getString(ORG_PREFIX);
         String orgName = missingKidJson.optString(ORG_NAME);

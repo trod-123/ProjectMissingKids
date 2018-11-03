@@ -39,7 +39,7 @@ public class KidsSyncUtils {
 
                 @Override
                 protected List<MissingKid> doInBackground(Void... voids) {
-                    return MissingKidsDatabase.getInstance(context).missingKidDao().loadAllKids();
+                    return MissingKidsDatabase.getInstance(context).missingKidDao().getAllKids_list();
                 }
 
                 @Override

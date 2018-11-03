@@ -109,7 +109,7 @@ public class KidsSyncTasks {
 
         for (MissingKid kid : missingKids) {
             // for checking whether kid already exists in db
-            MissingKid kidFromDb = dao.findKidByOrgPrefixCaseNum(kid.orgPrefixCaseNumber);
+            MissingKid kidFromDb = dao.getKidByOrgPrefixCaseNum(kid.orgPrefixCaseNumber);
 
             // for debugging: checks for duplicate ids
             boolean check = orgPrefixCaseNums.contains(kid.orgPrefixCaseNumber);
@@ -122,10 +122,10 @@ public class KidsSyncTasks {
             if (kidFromDb != null) {
                 // update kid only if it already exists in db
                 kid.uid = kidFromDb.uid;
-                numUpdated += dao.updateSingleKid(kid);
+                numUpdated += dao.update(kid);
             } else {
                 // otherwise, add the kid
-                dao.insertSingleKid(kid);
+                dao.insert(kid);
                 numInserted++;
             }
         }
@@ -164,7 +164,7 @@ public class KidsSyncTasks {
      * @return
      */
     private static MissingKid appendDetailDataWithPartialKid(String caseNumber, String orgPrefix) {
-        MissingKid partialKidData = mDb.missingKidDao().findKidByOrgPrefixCaseNum(orgPrefix + caseNumber);
+        MissingKid partialKidData = mDb.missingKidDao().getKidByOrgPrefixCaseNum(orgPrefix + caseNumber);
         JSONObject detailChildJson = null;
         try {
             detailChildJson = NetworkUtils.getDetailDataJson(caseNumber, orgPrefix);

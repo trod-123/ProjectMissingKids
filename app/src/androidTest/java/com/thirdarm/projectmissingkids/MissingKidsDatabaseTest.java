@@ -2,7 +2,6 @@ package com.thirdarm.projectmissingkids;
 
 import android.arch.persistence.room.Room;
 import android.content.Context;
-import android.database.Cursor;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
@@ -63,11 +62,11 @@ public class MissingKidsDatabaseTest {
         // create a missing kid object
         MissingKid kid = TestUtils.createOneKid();
         // store missing kid object into the database
-        mMissingKidDao.insertSingleKid(kid);
+        mMissingKidDao.insert(kid);
 
         // query the database for missing kids with the name "Jane"
         // notice the internals of the method take care of the sql stuff. instead of returning a cursor, we can return the MissingKid objects directly, which could be used to hold our objects in the RecyclerView. We can also return cursors, see writeMissingKidAndReadInCursor() below
-        List<MissingKid> byName = mMissingKidDao.findAllKidsByName("Jane");
+        List<MissingKid> byName = mMissingKidDao.getAllKidsByName_list("Jane");
         MissingKid kid2 = byName.get(0);
 
         // check that the missing kid from the query is the same as the missing kid we created
@@ -79,69 +78,4 @@ public class MissingKidsDatabaseTest {
         assertEquals(kid.caseNum, kid2.caseNum);
         assertEquals(kid.firstName, kid2.firstName);
     }
-
-    /**
-     * Inserts a dummy MissingKid object into the database, and access the object from the database via a search query that returns a cursor of MissingKids. Verifies equivalence between the MissingKid that was inserted, and what is accessed
-     *
-     * @throws Exception
-     */
-    @Test
-    public void writeMissingKidAndReadInCursor() throws Exception {
-        // create a missing kid object
-        MissingKid kid = TestUtils.createOneKid();
-        // store missing kid object into the database
-        mMissingKidDao.insertSingleKid(kid);
-
-        // query the database for missing kids with the name "Jane"
-        Cursor cursor = mMissingKidDao.findAllKidsByNameCursor("Jane");
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                String description = cursor.getString(cursor.getColumnIndex("description"));
-                String eyeColor = cursor.getString(cursor.getColumnIndex("eye_color"));
-                String gender = cursor.getString(cursor.getColumnIndex("gender"));
-                String hairColor = cursor.getString(cursor.getColumnIndex("hair_color"));
-                long ncmcId = cursor.getLong(cursor.getColumnIndex("ncmc_id"));
-                String firstName = cursor.getString(cursor.getColumnIndex("first_name"));
-
-
-                // check that the missing kid from the query is the same as the missing kid we created
-                // check each property of kid
-                assertEquals(kid.description, description);
-                assertEquals(kid.eyeColor, eyeColor);
-                assertEquals(kid.gender, gender);
-                assertEquals(kid.hairColor, hairColor);
-                assertEquals(kid.caseNum, ncmcId);
-                assertEquals(kid.firstName, firstName);
-            }
-            cursor.close();
-        }
-    }
-
-//    @Test
-//    public void writeMissingKidsToContentProviderAndReadInCursor() throws Exception {
-//        // delete database
-//        FakeDatabaseInitializer.deleteAllData(mDb);
-//
-//        // populate the fake database
-//        FakeDatabaseInitializer.populateSync(mDb);
-//
-//        List<MissingKid> kids = FakeDatabaseInitializer.getFakeKids();
-//        List<String> firstNames = new ArrayList<>();
-//        for (MissingKid kid : kids) {
-//            String firstName = kid.name.firstName;
-//            firstNames.add(firstName);
-//        }
-//        Context context = InstrumentationRegistry.getTargetContext();
-//        ContentResolver cr = context.getContentResolver();
-//
-//        // insert all the kids into the provider
-//
-//        // read all the kids
-//        Cursor cursor = cr.query(MissingKid.CONTENT_URI, null, null, null, null);
-//        cursor.moveToFirst();
-//        do {
-//            String firstName = cursor.getString(cursor.getColumnIndex("first_name"));
-//            assertTrue(firstNames.contains(firstName));
-//        } while (cursor.moveToNext());
-//    }
 }
