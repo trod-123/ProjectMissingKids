@@ -31,10 +31,6 @@
                 android:value=".MainActivity"/>
         </activity>
 
-        <service
-            android:name=".sync.KidsSyncIntentService"
-            android:exported="false"/>
-
     </application>
 
 </manifest>

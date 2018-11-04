@@ -2,18 +2,16 @@ package com.thirdarm.projectmissingkids;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.support.annotation.Nullable;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.format.DateFormat;
 
 import com.squareup.picasso.Picasso;
-import com.thirdarm.projectmissingkids.data.MissingKid;
-import com.thirdarm.projectmissingkids.data.MissingKidsDatabase;
+import com.thirdarm.projectmissingkids.data.model.MissingKid;
 import com.thirdarm.projectmissingkids.databinding.ActivityDetailBinding;
-import com.thirdarm.projectmissingkids.sync.KidsSyncUtils;
-import com.thirdarm.projectmissingkids.viewmodel.LiveDataDetailKidViewModel;
+import com.thirdarm.projectmissingkids.viewmodel.KidViewModel;
 
 import java.util.Date;
 
@@ -21,15 +19,10 @@ public class DetailActivity extends AppCompatActivity {
 
     private ActivityDetailBinding mDetailDataBinding;
 
-    private LiveDataDetailKidViewModel mLiveDataDetailKidViewModel;
+    private KidViewModel mViewModel;
 
-    private Bundle intentBundle;
-    private String uID;
-    private String orgPrefixID;
     public static final String ORG_PREFIX_KEY = "ORG_PREFIX";
-    public static final String UID_KEY = "UID";
-
-    private MissingKidsDatabase mDb;
+    public static final String CASE_NUM_KEY = "case_num";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,39 +31,22 @@ public class DetailActivity extends AppCompatActivity {
 
         mDetailDataBinding = DataBindingUtil.setContentView(this, R.layout.activity_detail);
 
-        intentBundle = getIntent().getExtras();
+        Bundle intentBundle = getIntent().getExtras();
+        if (intentBundle != null) {
+            String orgPrefix = intentBundle.getString(ORG_PREFIX_KEY);
+            String caseNum = intentBundle.getString(CASE_NUM_KEY);
 
-        uID = intentBundle.getString(UID_KEY);
-        orgPrefixID = intentBundle.getString(ORG_PREFIX_KEY);
-
-        mDb = MissingKidsDatabase.getInstance(this);
-        // get the instance of the Kids view model and then subscribe to events
-        mLiveDataDetailKidViewModel = ViewModelProviders.of(this).get(LiveDataDetailKidViewModel.class);
-        subscribe();
-    }
-
-    /**
-     * Helper method to pair the UI observer with the ViewModel. The observer is used to monitor
-     * changes to the list of missing kids. If the list changes, then the Observer's onChanged()
-     * method is called, refreshing the KidAdapter's list with the new list
-     */
-    private void subscribe() {
-        // load the kids
-        mLiveDataDetailKidViewModel.loadKidDetailsFromLocalDbAsync(mDb, orgPrefixID + uID);
-
-        // load detail data
-        KidsSyncUtils.fetchDetailDataFromServer(this, uID, orgPrefixID);
-
-        // set up the observer which updates the UI
-        final Observer<MissingKid> detailKidObserver = new Observer<MissingKid>() {
-
-            @Override
-            public void onChanged(@Nullable MissingKid detailKid) {
-                loadUI(detailKid);
-            }
-        };
-
-        mLiveDataDetailKidViewModel.getMissingKidDetails().observe(this, detailKidObserver);
+            // get the instance of the Kids view model and then subscribe to events
+            mViewModel = ViewModelProviders.of(this).get(KidViewModel.class);
+            mViewModel.getKidByOrgPrefixCaseNum(orgPrefix, caseNum).observe(this, new Observer<MissingKid>() {
+                @Override
+                public void onChanged(@Nullable MissingKid missingKid) {
+                    loadUI(missingKid);
+                }
+            });
+        } else {
+            throw new UnsupportedOperationException("DetailActivity/Intent bundle can't be null.");
+        }
     }
 
     public void loadUI(MissingKid data) {

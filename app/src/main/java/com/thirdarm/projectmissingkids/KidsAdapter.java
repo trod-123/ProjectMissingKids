@@ -1,7 +1,6 @@
 package com.thirdarm.projectmissingkids;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
@@ -13,7 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
-import com.thirdarm.projectmissingkids.data.MissingKid;
+import com.thirdarm.projectmissingkids.data.model.MissingKid;
 
 import java.util.Date;
 import java.util.List;
@@ -29,7 +28,7 @@ public class KidsAdapter extends RecyclerView.Adapter<KidsAdapter.KidsAdapterVie
      * The id is the NCMC number to identify the kid.
      */
     public interface KidsAdapterOnClickHandler {
-        void onClick(String id, String orgPrefix);
+        void onClick(String orgPrefix, String caseNum);
     }
 
 
@@ -62,8 +61,8 @@ public class KidsAdapter extends RecyclerView.Adapter<KidsAdapter.KidsAdapterVie
          * NAME *
          ********/
         String name = kid.firstName + " " +
-                        kid.middleName + " " +
-                        kid.lastName;
+                kid.middleName + " " +
+                kid.lastName;
 
         // Below gets rid of double spaces if there's no middle name
         String formatedName = name.replaceAll("\\s{2,}", " ").trim();
@@ -96,8 +95,8 @@ public class KidsAdapter extends RecyclerView.Adapter<KidsAdapter.KidsAdapterVie
          * LOCATION *
          ************/
         String location = kid.locCity + ", " +
-                            kid.locState + ", " +
-                            kid.locCountry + " ";
+                kid.locState + ", " +
+                kid.locCountry + " ";
         holder.locationView.setText("Location: " + location);
     }
 
@@ -142,9 +141,9 @@ public class KidsAdapter extends RecyclerView.Adapter<KidsAdapter.KidsAdapterVie
             // Ensure that item exists even through list swapping, or else app would crash
             if (adapterPosition != RecyclerView.NO_POSITION) {
                 MissingKid kid = kids.get(adapterPosition);
-                String uId = kid.caseNum;
+                String caseNum = kid.caseNum;
                 String orgPrefix = kid.orgPrefix;
-                mClickHandler.onClick(uId, orgPrefix);
+                mClickHandler.onClick(orgPrefix, caseNum);
             } else {
                 Toast.makeText(view.getContext(), "Click error", Toast.LENGTH_SHORT).show();
             }

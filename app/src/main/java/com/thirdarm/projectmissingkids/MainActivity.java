@@ -3,37 +3,32 @@ package com.thirdarm.projectmissingkids;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
-import com.thirdarm.projectmissingkids.data.MissingKid;
-import com.thirdarm.projectmissingkids.data.MissingKidsDatabase;
-import com.thirdarm.projectmissingkids.sync.KidsSyncUtils;
-import com.thirdarm.projectmissingkids.viewmodel.LiveDataKidsListViewModel;
+import com.thirdarm.projectmissingkids.data.model.MissingKid;
+import com.thirdarm.projectmissingkids.viewmodel.KidViewModel;
 
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements
         KidsAdapter.KidsAdapterOnClickHandler {
 
-    // For keeping reference to db
-    MissingKidsDatabase mDb;
+    private static final String TAG = MainActivity.class.getSimpleName();
 
     private KidsAdapter mKidsAdapter;
     private RecyclerView mRecyclerView;
     private ProgressBar mLoadingIndicator;
 
-    private LiveDataKidsListViewModel mLiveDataKidsListViewModel;
-
-    public static final String ORG_PREFIX_KEY = "ORG_PREFIX";
-    public static final String UID_KEY = "UID";
+    private KidViewModel mViewModel;
 
     List<MissingKid> kids;
 
@@ -63,32 +58,16 @@ public class MainActivity extends AppCompatActivity implements
 
         mRecyclerView.setAdapter(mKidsAdapter);
 
-        // set up the database
-        mDb = MissingKidsDatabase.getInstance(this);
-
+        Log.d(TAG, "Before observe()");
         // get the instance of the Kids view model and then subscribe to events
-        mLiveDataKidsListViewModel = ViewModelProviders.of(this).get(LiveDataKidsListViewModel.class);
-        subscribe();
-    }
-
-    /**
-     * Helper method to pair the UI observer with the ViewModel. The observer is used to monitor
-     * changes to the list of missing kids. If the list changes, then the Observer's onChanged()
-     * method is called, refreshing the KidAdapter's list with the new list
-     */
-    private void subscribe() {
-        // load the kids
-        mLiveDataKidsListViewModel.loadKidsFromLocalDbAsync(mDb);
-
-        // load online data
-        // TODO: This currently replaces all detail data with null values
-        KidsSyncUtils.initialize(this);
-
-        // set up the observer which updates the UI
-        final Observer<List<MissingKid>> kidsObserver = new Observer<List<MissingKid>>() {
-
+        mViewModel = ViewModelProviders.of(this).get(KidViewModel.class);
+        mViewModel.getAllKids().observe(this, new Observer<List<MissingKid>>() {
             @Override
             public void onChanged(@Nullable List<MissingKid> missingKids) {
+                if (missingKids == null || missingKids.size() == 0) {
+                    Toast.makeText(MainActivity.this, "No results", Toast.LENGTH_SHORT).show();
+                }
+                Log.d(TAG, "In observe()");
                 mKidsAdapter.swapList(missingKids);
                 kids = missingKids;
                 if (!visible) {
@@ -96,11 +75,8 @@ public class MainActivity extends AppCompatActivity implements
                     visible = true;
                 }
             }
-        };
-
+        });
         showLoading();
-        mLiveDataKidsListViewModel.getMissingKids().observe(this, kidsObserver);
-
     }
 
     private void showView() {
@@ -122,14 +98,15 @@ public class MainActivity extends AppCompatActivity implements
      * Get value for NCMC from the onClick
      * and pass the NCMC id to the detailActivity
      *
-     * @param id The NCMC id for the row that was clicked
+     * @param orgPrefix
+     * @param caseNum
      */
     @Override
-    public void onClick(String id, String orgPrefix) {
+    public void onClick(String orgPrefix, String caseNum) {
         // TODO: For some reason, clicks are not being registered while list is being updated via LiveData
         Intent detailIntent = new Intent(MainActivity.this, DetailActivity.class);
-        detailIntent.putExtra(UID_KEY, id);
-        detailIntent.putExtra(ORG_PREFIX_KEY, orgPrefix);
+        detailIntent.putExtra(DetailActivity.ORG_PREFIX_KEY, orgPrefix);
+        detailIntent.putExtra(DetailActivity.CASE_NUM_KEY, caseNum);
         startActivity(detailIntent);
     }
 }

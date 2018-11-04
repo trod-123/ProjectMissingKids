@@ -1,5 +1,7 @@
 package com.thirdarm.projectmissingkids.util;
 
+import android.util.Pair;
+
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -12,9 +14,9 @@ public class GeneralUtilsTest {
     @Test
     public void testApproxAgeRangeConversionToInt() throws Exception {
         String ageRange = "15-25";
-        Tuple<Integer, Integer> ageRangeTuple = GeneralUtils.convertStringNumberRangeToInts(ageRange);
+        Pair<Integer, Integer> ageRangeTuple = GeneralUtils.convertStringNumberRangeToInts(ageRange);
 
-        assertEquals(15, (int) ageRangeTuple.x);
-        assertEquals(25, (int) ageRangeTuple.y);
+        assertEquals(15, (int) ageRangeTuple.first);
+        assertEquals(25, (int) ageRangeTuple.second);
     }
 }

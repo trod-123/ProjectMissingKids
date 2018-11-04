@@ -1,4 +1,4 @@
-package com.thirdarm.projectmissingkids.data;
+package com.thirdarm.projectmissingkids.data.local;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
@@ -7,7 +7,8 @@ import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
-import android.database.Cursor;
+
+import com.thirdarm.projectmissingkids.data.model.MissingKid;
 
 import java.util.List;
 
@@ -36,7 +37,7 @@ public interface MissingKidDao {
      * @return List of all MissingKids
      */
     @Query("SELECT * FROM kids")
-    List<MissingKid> getAllKids_list();
+    List<MissingKid> getAllKidsAsync();
 
     /**
      * Gets all the MissingKids currently in the database
@@ -47,13 +48,13 @@ public interface MissingKidDao {
     LiveData<List<MissingKid>> getAllKids();
 
     /**
-     * Gets the MissingKid with the provided  uid
+     * Gets the MissingKid with the provided NCMC id
      *
-     * @param uid The uid
-     * @return The MissingKid associated with the uid
+     * @param orgPrefixCaseNumber The unique identifier
+     * @return The MissingKid associated with the NCMC id
      */
-    @Query("SELECT * FROM kids WHERE uid IS :uid")
-    LiveData<MissingKid> getKidByUid(int uid);
+    @Query("SELECT * FROM kids WHERE orgPrefixCaseNumber IS :orgPrefixCaseNumber")
+    MissingKid getKidByOrgPrefixCaseNumAsync(String orgPrefixCaseNumber);
 
     /**
      * Gets the MissingKid with the provided NCMC id
@@ -62,26 +63,7 @@ public interface MissingKidDao {
      * @return The MissingKid associated with the NCMC id
      */
     @Query("SELECT * FROM kids WHERE orgPrefixCaseNumber IS :orgPrefixCaseNumber")
-    MissingKid getKidByOrgPrefixCaseNum(String orgPrefixCaseNumber);
-
-    /**
-     * Gets the MissingKid with the provided NCMC id
-     *
-     * @param orgPrefixCaseNumber The unique identifier
-     * @return The MissingKid associated with the NCMC id
-     */
-    @Query("SELECT * FROM kids WHERE orgPrefixCaseNumber IS :orgPrefixCaseNumber")
-    LiveData<MissingKid> getKidByOrgPrefixCaseNumSync(String orgPrefixCaseNumber);
-
-    /**
-     * Searches for MissingKids with the provided name
-     *
-     * @param search The name to search
-     * @return The MissingKids with a first OR last name that matches the provided search parameter
-     */
-    @Query("SELECT * FROM kids WHERE first_name LIKE :search " +
-            "OR last_name LIKE :search")
-    List<MissingKid> getAllKidsByName_list(String search);
+    LiveData<MissingKid> getKidByOrgPrefixCaseNum(String orgPrefixCaseNumber);
 
     /**
      * Searches for MissingKids with the provided name

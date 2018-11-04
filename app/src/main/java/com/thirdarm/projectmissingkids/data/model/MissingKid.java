@@ -1,19 +1,18 @@
-package com.thirdarm.projectmissingkids.data;
+package com.thirdarm.projectmissingkids.data.model;
 
 import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
+import android.util.Pair;
 
 import com.thirdarm.projectmissingkids.util.GeneralUtils;
-import com.thirdarm.projectmissingkids.util.Tuple;
 
 /**
  * This entity represents a MissingKid table within the MissingKidsDatabase.  Contains all the "columns" of an SQLite database table
  */
 @Entity(tableName = "kids",
-        indices = {@Index(value={"orgPrefixCaseNumber"}, unique = true)})
+        indices = {@Index(value = {"orgPrefixCaseNumber"}, unique = true)})
 public class MissingKid {
 
     /**
@@ -51,12 +50,12 @@ public class MissingKid {
      * @param race
      */
     public MissingKid(String caseNumber, String orgPrefix, String orgName, boolean isChild,
-                     int seqNumber, String langId, String firstName, String lastName,
-                     String middleName, String missingCity, String missingCounty,
-                     String missingState, String missingCountry, java.util.Date missingDate, int age,
-                     boolean inMonth, boolean inDay, String approxAge, boolean hasThumbnail,
-                     boolean hasPoster, String thumbnailURL, String caseType, String posterTitle,
-                     String race) {
+                      int seqNumber, String langId, String firstName, String lastName,
+                      String middleName, String missingCity, String missingCounty,
+                      String missingState, String missingCountry, java.util.Date missingDate, int age,
+                      boolean inMonth, boolean inDay, String approxAge, boolean hasThumbnail,
+                      boolean hasPoster, String thumbnailURL, String caseType, String posterTitle,
+                      String race) {
         this.caseNum = caseNumber;
         this.orgPrefix = orgPrefix;
         this.orgPrefixCaseNumber = orgPrefix + caseNumber;
@@ -70,7 +69,7 @@ public class MissingKid {
         this.locCity = missingCity;
         //this.missingCounty = missingCounty;
         this.locState = missingState;
-        this.locCountry= missingCountry;
+        this.locCountry = missingCountry;
         if (missingDate != null) {
             this.dateMissing = missingDate.getTime();
         }
@@ -78,9 +77,9 @@ public class MissingKid {
         //this.inMonth = inMonth;
         //this.inDay = inDay;
         if (!approxAge.equals("")) {
-            Tuple<Integer, Integer> ageRange = GeneralUtils.convertStringNumberRangeToInts(approxAge);
-            this.estAgeLower = ageRange.x;
-            this.estAgeHigher = ageRange.y;
+            Pair<Integer, Integer> ageRange = GeneralUtils.convertStringNumberRangeToInts(approxAge);
+            this.estAgeLower = ageRange.first;
+            this.estAgeHigher = ageRange.second;
         }
         //this.hasThumbnail = hasThumbnail;
         //this.hasPoster = hasPoster;
@@ -150,13 +149,13 @@ public class MissingKid {
     }
 
     /**
-     *  Primary key, for the local database. Not related to any ncmc/ncic/namus ids
+     * Primary key, for the local database. Not related to any ncmc/ncic/namus ids
      */
     @PrimaryKey(autoGenerate = true)
     public int uid;
 
     /**
-     *  The case number
+     * The case number
      */
     public String caseNum;
 
@@ -166,7 +165,9 @@ public class MissingKid {
     public String orgPrefix;
 
     /**
-     * Organization prefix combined with Case number (to be used as the unique id)
+     * Organization prefix concatenated with Case number (to be used as the unique id)
+     * <p>
+     * {@code orgPrefix + caseNum}
      */
     public String orgPrefixCaseNumber;
 
@@ -243,15 +244,15 @@ public class MissingKid {
     @ColumnInfo(name = "loc_country")
     public String locCountry;
 
-/**
- *  Url linking to detailed information about child (String)
- *  (this can be generated using "api.missingkids.org/poster/NCMC/[ncmec_id]", CP entry may not be needed)
- */
+    /**
+     * Url linking to detailed information about child (String)
+     * (this can be generated using "api.missingkids.org/poster/NCMC/[ncmec_id]", CP entry may not be needed)
+     */
     @ColumnInfo(name = "poster_url")
     public String posterUrl;
 
     /**
-     *  Url linking to child's original photo, if any (String)
+     * Url linking to child's original photo, if any (String)
      */
     @ColumnInfo(name = "original_photo_url")
     public String originalPhotoUrl;
@@ -263,61 +264,61 @@ public class MissingKid {
 //    public String[] extraPhotosUrl;
 
     /**
-     *  Blurb of additional details of child (String)
+     * Blurb of additional details of child (String)
      */
     public String description;
 
     /**
-     *  Status (STATUS enumeration / constant)
-     *  - Missing
-     *  - Unidentified child
-     *  - NonFamily Abduction
-     *  - Endangered Missing
-     *  - Family Abduction
-     *  - Endangered Runaway
-     *  - Endangered Missing
-     *  - ...
+     * Status (STATUS enumeration / constant)
+     * - Missing
+     * - Unidentified child
+     * - NonFamily Abduction
+     * - Endangered Missing
+     * - Family Abduction
+     * - Endangered Runaway
+     * - Endangered Missing
+     * - ...
      */
     public String status;
 
     /**
-     *  Child's gender (male, female) (GENDER enumeration / constant)
+     * Child's gender (male, female) (GENDER enumeration / constant)
      */
     public String gender;
 
     /**
-     *  Child's race (String)
+     * Child's race (String)
      */
     public String race;
 
     /**
-     *  Child's hair color (String)
+     * Child's hair color (String)
      */
     @ColumnInfo(name = "hair_color")
     public String hairColor;
 
     /**
-     *  Child's eye color (String)
+     * Child's eye color (String)
      */
     @ColumnInfo(name = "eye_color")
     public String eyeColor;
 
     /**
-     *  Child's height, in imperial units (inches) (double)
+     * Child's height, in imperial units (inches) (double)
      */
     @ColumnInfo(name = "height_imperial")
     public double heightImperial;
 
     /**
-     *  Estimated height, in imperial units (inches): lower bound (double)
-     *  Only provided for specific statuses (e.g. Unidentified Child)
+     * Estimated height, in imperial units (inches): lower bound (double)
+     * Only provided for specific statuses (e.g. Unidentified Child)
      */
     @ColumnInfo(name = "est_height_imperial_lower")
     public double estHeightImperialLower;
 
     /**
-     *  Estimated height, in imperial units (inches): upper bound (double)
-     *  Only provided for specific statuses (e.g. Unidentified Child)
+     * Estimated height, in imperial units (inches): upper bound (double)
+     * Only provided for specific statuses (e.g. Unidentified Child)
      */
     @ColumnInfo(name = "est_height_imperial_higher")
     public double estHeightImperialHigher;
@@ -329,7 +330,7 @@ public class MissingKid {
     public double weightImperial;
 
     /**
-     *  Information source (usually it's "National Center for Missing & Exploited Children", but can also be "NCMEC-Unidentified" if child status is "Unidentified")
+     * Information source (usually it's "National Center for Missing & Exploited Children", but can also be "NCMEC-Unidentified" if child status is "Unidentified")
      */
     public String source;
 }

@@ -1,6 +1,6 @@
 package com.thirdarm.projectmissingkids.util;
 
-import com.thirdarm.projectmissingkids.data.MissingKid;
+import com.thirdarm.projectmissingkids.data.model.MissingKid;
 
 import java.util.ArrayList;
 import java.util.List;

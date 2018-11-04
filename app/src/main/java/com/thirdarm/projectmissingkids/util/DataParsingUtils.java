@@ -1,9 +1,10 @@
 package com.thirdarm.projectmissingkids.util;
 
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.thirdarm.projectmissingkids.data.MissingKid;
+import com.thirdarm.projectmissingkids.data.model.MissingKid;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -140,12 +141,18 @@ public class DataParsingUtils {
 
     /**
      * Parses the detail data for a MissingKid and adds it to the missingKid object for that MissingKid
+     * <p>
+     * Returns the originally provided missing kid if {@code missingKidJson} is null
      *
      * @param missingKidJson the JSONObject containing the detail data to be parsed
-     * @param missingKid the missingKid object to add the detail data to
+     * @param missingKid     the missingKid object to add the detail data to
      * @return the missingKid with the added detail data
      */
-    public static MissingKid parseDetailDataForMissingKid(JSONObject missingKidJson, MissingKid missingKid) {
+    public static MissingKid parseDetailDataForMissingKid(@Nullable JSONObject missingKidJson, MissingKid missingKid) {
+        if (missingKidJson == null) {
+            Log.w(TAG, "missingKidJson was null. returning original missingKid");
+            return missingKid;
+        }
         Log.d(TAG, "missingKidJson: " + missingKidJson.toString());
         // TODO check to see if the detail data is for the same case number as the missingKid
         boolean hasAgedPhoto = missingKidJson.optBoolean(HAS_AGED_PHOTO);
