@@ -1,4 +1,4 @@
-package com.thirdarm.projectmissingkids;
+package com.thirdarm.projectmissingkids.ui;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.format.DateFormat;
 
 import com.squareup.picasso.Picasso;
+import com.thirdarm.projectmissingkids.R;
 import com.thirdarm.projectmissingkids.data.model.MissingKid;
 import com.thirdarm.projectmissingkids.databinding.ActivityDetailBinding;
 import com.thirdarm.projectmissingkids.viewmodel.KidViewModel;

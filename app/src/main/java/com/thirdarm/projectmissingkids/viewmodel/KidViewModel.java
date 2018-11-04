@@ -33,6 +33,14 @@ public class KidViewModel extends AndroidViewModel {
         return mRepository.getAllKids();
     }
 
+    /**
+     * Gets a single MissingKid and fetches and merges its details in a background thread,
+     * if missing
+     *
+     * @param orgPrefix
+     * @param caseNum
+     * @return
+     */
     public LiveData<MissingKid> getKidByOrgPrefixCaseNum(String orgPrefix, String caseNum) {
         return mRepository.getKidByOrgPrefixCaseNum(orgPrefix, caseNum);
     }

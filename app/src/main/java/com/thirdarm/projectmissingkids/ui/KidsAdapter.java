@@ -1,4 +1,4 @@
-package com.thirdarm.projectmissingkids;
+package com.thirdarm.projectmissingkids.ui;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -12,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
+import com.thirdarm.projectmissingkids.R;
 import com.thirdarm.projectmissingkids.data.model.MissingKid;
 
 import java.util.Date;

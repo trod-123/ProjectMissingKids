@@ -85,7 +85,7 @@ public interface MissingKidDao {
      * @param kids The list of MissingKids to insert
      * @return The array of rowIds for all inserted items
      */
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert
     Long[] insert(MissingKid... kids);
 
     /**
@@ -94,7 +94,7 @@ public interface MissingKidDao {
      * @param kid The MissingKid to insert
      * @return The rowId for the inserted item
      */
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert
     Long insert(MissingKid kid);
 
     // endregion
@@ -107,7 +107,7 @@ public interface MissingKidDao {
      * @param kids The list of MissingKids to update
      * @return The number of rows updated in the database
      */
-    @Update
+    @Update(onConflict = OnConflictStrategy.REPLACE)
     int update(MissingKid... kids);
 
     /**
@@ -116,7 +116,7 @@ public interface MissingKidDao {
      * @param kid The MissingKid to update
      * @return The number of rows updated in the database
      */
-    @Update
+    @Update(onConflict = OnConflictStrategy.REPLACE)
     int update(MissingKid kid);
 
     // endregion

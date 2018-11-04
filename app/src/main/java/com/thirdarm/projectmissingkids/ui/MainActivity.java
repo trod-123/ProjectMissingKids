@@ -1,4 +1,4 @@
-package com.thirdarm.projectmissingkids;
+package com.thirdarm.projectmissingkids.ui;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.thirdarm.projectmissingkids.R;
 import com.thirdarm.projectmissingkids.data.model.MissingKid;
 import com.thirdarm.projectmissingkids.viewmodel.KidViewModel;
 
