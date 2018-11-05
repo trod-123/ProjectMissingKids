@@ -2,6 +2,7 @@ package com.thirdarm.projectmissingkids.ui;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.arch.paging.PagedList;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -12,10 +13,10 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.thirdarm.projectmissingkids.R;
 import com.thirdarm.projectmissingkids.data.model.MissingKid;
+import com.thirdarm.projectmissingkids.util.NetworkState;
 import com.thirdarm.projectmissingkids.viewmodel.KidViewModel;
 
 import java.util.List;
@@ -54,29 +55,46 @@ public class MainActivity extends AppCompatActivity implements
 
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
-
-        mKidsAdapter = new KidsAdapter(kids, this, this);
-
+        mKidsAdapter = new KidsAdapter(this, this);
         mRecyclerView.setAdapter(mKidsAdapter);
 
         Log.d(TAG, "Before observe()");
         // get the instance of the Kids view model and then subscribe to events
         mViewModel = ViewModelProviders.of(this).get(KidViewModel.class);
-        mViewModel.getAllKids().observe(this, new Observer<List<MissingKid>>() {
+        mViewModel.getKidLiveData().observe(this, new Observer<PagedList<MissingKid>>() {
             @Override
-            public void onChanged(@Nullable List<MissingKid> missingKids) {
-                if (missingKids == null || missingKids.size() == 0) {
-                    Toast.makeText(MainActivity.this, "No results", Toast.LENGTH_SHORT).show();
-                }
-                Log.d(TAG, "In observe()");
-                mKidsAdapter.swapList(missingKids);
-                kids = missingKids;
+            public void onChanged(@Nullable PagedList<MissingKid> missingKids) {
+                mKidsAdapter.submitList(missingKids);
                 if (!visible) {
                     showView();
                     visible = true;
                 }
             }
         });
+        // for the network state
+        mViewModel.getNetworkState().observe(this, new Observer<NetworkState>() {
+            @Override
+            public void onChanged(@Nullable NetworkState networkState) {
+                mKidsAdapter.setNetworkState(networkState);
+            }
+        });
+
+
+//        mViewModel.getAllKids().observe(this, new Observer<PagedList<MissingKid>>() {
+//            @Override
+//            public void onChanged(@Nullable PagedList<MissingKid> missingKids) {
+//                if (missingKids == null || missingKids.size() == 0) {
+//                    Toast.makeText(MainActivity.this, "No results", Toast.LENGTH_SHORT).show();
+//                }
+//                Log.d(TAG, "In observe()");
+//                mKidsAdapter.submitList(missingKids);
+//                kids = missingKids;
+//                if (!visible) {
+//                    showView();
+//                    visible = true;
+//                }
+//            }
+//        });
         showLoading();
     }
 

@@ -147,7 +147,7 @@ public class NetworkUtils {
      * @throws JSONException
      */
     public static JSONArray getSearchResultsDataJsonArray() throws JSONException {
-        NetworkUtils.getSearchResultsMetadataJson(); // needed to "wake up" the server, or else we get no results
+//        NetworkUtils.getSearchResultsMetadataJson(); // needed to "wake up" the server, or else we get no results
         URL beginSearchURL = buildJsonDataBeginSearchUrl();
         try {
             String beginSearchJsonStr = getResponseFromHttpUrl(beginSearchURL);
@@ -244,7 +244,7 @@ public class NetworkUtils {
      * @throws JSONException if there was a problem parsing the server response.
      */
     public static JSONArray getSearchResultPageJsonArray(int pageNumber) throws JSONException {
-        NetworkUtils.getSearchResultsMetadataJson(); // needed to "wake up" the server, or else we get no results
+//        NetworkUtils.getSearchResultsMetadataJson(); // needed to "wake up" the server, or else we get no results
         URL pageUrl = buildJsonDataSearchPageUrl(pageNumber);
         String pageJsonStr = null;
         try {

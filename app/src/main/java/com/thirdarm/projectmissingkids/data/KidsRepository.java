@@ -2,7 +2,6 @@ package com.thirdarm.projectmissingkids.data;
 
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
-import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -14,16 +13,12 @@ import com.thirdarm.projectmissingkids.data.model.MissingKid;
 import com.thirdarm.projectmissingkids.data.remote.RemoteSync;
 import com.thirdarm.projectmissingkids.util.DataParsingUtils;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 
 /**
  * Interface to all database sources (local and remote)
@@ -33,16 +28,40 @@ public class KidsRepository {
 
     private static final String TAG = KidsRepository.class.getSimpleName();
 
-    private static final int DEFAULT_PAGE_SIZE = 20;
-
     private MissingKidDao mDao;
-    private Context mContext;
     private ExecutorService mExecutor;
+    private RemoteSync mRemoteSyncHelper;
+
+    /**
+     * Callback for passing in database results where LiveData can't be used.
+     * To be used with {@link RunnableCallback}
+     *
+     * @param <T>
+     */
+    public interface DatabaseCallback<T> {
+        void onResponse(T response);
+    }
+
+    /**
+     * Runnable that takes a callback for passing in results. See {@link DatabaseCallback}
+     *
+     * @param <T>
+     */
+    private class RunnableCallback<T> implements Runnable {
+        DatabaseCallback<T> callback;
+
+        RunnableCallback(DatabaseCallback<T> callback) {
+            this.callback = callback;
+        }
+
+        public void run() {
+        }
+    }
 
     public KidsRepository(Application application, ExecutorService executor) {
         mDao = getDao(application);
-        mContext = application;
         mExecutor = executor;
+        mRemoteSyncHelper = new RemoteSync(executor);
     }
 
     private MissingKidDao getDao(Application application) {
@@ -74,26 +93,43 @@ public class KidsRepository {
      */
     public LiveData<List<MissingKid>> getAllKids() {
         LiveData<List<MissingKid>> kidsInDb = mDao.getAllKids();
-        if (kidsInDb.getValue() == null) {
-            // Database hasn't been initialized. Sync now
-            fetchAndStoreAllKidsOnlineParallel();
-        }
+        // TODO: Sync only if needed
+        fetchAndStoreSinglePage(1);
         return kidsInDb;
     }
 
     /**
      * Returns the kid with the matching orgPrefixCaseNum. If there are missing Details, then this
      * loads the details in a background thread. When details are finished loading, the LiveData's
-     * observer will be notified of the change automatically
+     * observer will be notified of the change automatically with additional effort on our part
      *
-     * @param orgPrefix
-     * @param caseNum
      * @return
      */
-    public LiveData<MissingKid> getKidByOrgPrefixCaseNum(String orgPrefix, String caseNum) {
-        String orgPrefixCaseNum = orgPrefix + caseNum;
-        fetchAndStoreSingleDetail(caseNum, orgPrefix); // async
+    public LiveData<MissingKid> getKidByOrgPrefixCaseNum(String orgPrefixCaseNum) {
+        mExecutor.execute(new GetKidByOrgPrefixCaseNumRunnable(orgPrefixCaseNum, new DatabaseCallback<MissingKid>() {
+            @Override
+            public void onResponse(MissingKid response) {
+                fetchAndStoreSingleDetail(response); // async
+            }
+        }));
         return mDao.getKidByOrgPrefixCaseNum(orgPrefixCaseNum);
+    }
+
+    /**
+     * Gets a kid locally for processing afterwards
+     */
+    private class GetKidByOrgPrefixCaseNumRunnable extends RunnableCallback<MissingKid> {
+        private String orgPrefixCaseNum;
+
+        GetKidByOrgPrefixCaseNumRunnable(String orgPrefixCaseNum, DatabaseCallback<MissingKid> callback) {
+            super(callback);
+            this.orgPrefixCaseNum = orgPrefixCaseNum;
+        }
+
+        @Override
+        public void run() {
+            callback.onResponse(getKidByOrgPrefixCaseNumAsync(orgPrefixCaseNum));
+        }
     }
 
     /**
@@ -261,17 +297,26 @@ public class KidsRepository {
      * result pages asynchronously, and stores the kids immediately upon each page's return
      */
     private void fetchAndStoreAllKidsOnlineParallel() {
-        Future<Integer> response = mExecutor.submit(new FetchNumPagesCallable());
-        try {
-            int numPages = response.get();
-            if (numPages != RemoteSync.NO_DATA_RETURNED) {
-                for (int i = 1; i <= numPages; i++) {
-                    fetchAndStoreSinglePage(i);
+        mRemoteSyncHelper.fetchNumPages(new RemoteSync.RemoteSyncCallback<Integer>() {
+            @Override
+            public void onDataReceived(Integer numPages) {
+                if (numPages != RemoteSync.NO_DATA_RETURNED) {
+                    for (int i = 1; i <= numPages; i++) {
+                        fetchAndStoreSinglePage(i);
+                    }
                 }
             }
-        } catch (InterruptedException | ExecutionException e) {
-            Log.w(TAG, "Error getting numPages from future task. Not doing anything: " + e);
-        }
+
+            @Override
+            public void onNoDataReturned(String message) {
+                Log.d(TAG + "/fetchAllKidsParallel", message);
+            }
+
+            @Override
+            public void onFailure(Exception e, String message) {
+                Log.w(TAG + "/fetchAllKidsParallel", "Error getting numPages. Not doing anything:\n" + e);
+            }
+        });
     }
 
     /**
@@ -280,77 +325,51 @@ public class KidsRepository {
      * @param pageNum
      */
     private void fetchAndStoreSinglePage(int pageNum) {
-        Future<List<MissingKid>> response = mExecutor.submit(new FetchKidsCallable(pageNum));
-        storeFetchedKids(response);
+        mRemoteSyncHelper.fetchSinglePage(pageNum,
+                new RemoteSync.RemoteSyncCallback<RemoteSync.PageResponse<MissingKid>>() {
+                    @Override
+                    public void onDataReceived(@Nullable RemoteSync.PageResponse<MissingKid> response) {
+                        if (response != null) {
+                            storeFetchedKids(response.results);
+                        } else {
+                            Log.w(TAG + "/fetchSinglePage", "No data returned to store");
+                        }
+                    }
+
+                    @Override
+                    public void onNoDataReturned(String message) {
+                        Log.d(TAG + "/fetchSinglePage", message);
+                    }
+
+                    @Override
+                    public void onFailure(Exception e, String message) {
+                        Log.w(TAG + "/fetchSinglePage", "Error getting kids. Not doing anything:\n" + e);
+                    }
+                });
     }
 
     /**
-     * Stores Future kid lists asynchronously
+     * Stores kids asynchronously
      *
-     * @param callableResponse
+     * @param kids
      */
-    private void storeFetchedKids(Future<List<MissingKid>> callableResponse) {
-        mExecutor.execute(new StoreFetchedKidsRunnable(callableResponse));
+    private void storeFetchedKids(@NonNull List<MissingKid> kids) {
+        mExecutor.execute(new StoreKidsRunnable(kids));
     }
 
-    private class StoreFetchedKidsRunnable implements Runnable {
-        Future<List<MissingKid>> callableResponse;
+    /**
+     * Stores kids in the background. See {@link KidsRepository#storeKidsLocally(List)}
+     */
+    private class StoreKidsRunnable implements Runnable {
+        List<MissingKid> kids;
 
-        StoreFetchedKidsRunnable(Future<List<MissingKid>> callableResponse) {
-            this.callableResponse = callableResponse;
+        StoreKidsRunnable(@NonNull List<MissingKid> kids) {
+            this.kids = kids;
         }
 
         @Override
         public void run() {
-            try {
-                @Nullable List<MissingKid> result = callableResponse.get();
-                if (result != null) {
-                    storeKidsInLocalDb(result);
-                } else {
-                    Log.e(TAG + "/storeFetchedKids", "No data returned to store");
-                }
-            } catch (InterruptedException | ExecutionException e) {
-                Log.w(TAG + "/storeFetchedKids", "Error getting kids from future task. Not doing anything: " + e);
-            }
-        }
-    }
-
-    /**
-     * Gets the number of pages in the query
-     */
-    private class FetchNumPagesCallable implements Callable<Integer> {
-        public Integer call() {
-            try {
-                return RemoteSync.getNumPages();
-            } catch (JSONException e) {
-                e.printStackTrace();
-                Log.e(TAG, "Error getting search results");
-            }
-            return RemoteSync.NO_DATA_RETURNED;
-        }
-    }
-
-    /**
-     * Fetches kids online
-     */
-    private class FetchKidsCallable implements Callable<List<MissingKid>> {
-        private int pageNum;
-        private static final int ALL_PAGES = -1;
-
-        FetchKidsCallable(int pageNum) {
-            this.pageNum = pageNum;
-        }
-
-        @Override
-        @Nullable
-        public List<MissingKid> call() {
-            List<MissingKid> kids;
-            if (pageNum != ALL_PAGES) {
-                kids = RemoteSync.fetchSinglePageOfKids(pageNum);
-            } else {
-                kids = RemoteSync.fetchAllPagesOfKids();
-            }
-            return kids;
+            storeKidsLocally(kids);
         }
     }
 
@@ -361,7 +380,7 @@ public class KidsRepository {
      *
      * @param missingKids The list of MissingKids data
      */
-    private void storeKidsInLocalDb(@NonNull List<MissingKid> missingKids) {
+    private void storeKidsLocally(@NonNull List<MissingKid> missingKids) {
         List<MissingKid> inserts = new ArrayList<>();
         List<MissingKid> updates = new ArrayList<>();
         for (MissingKid kid : missingKids) {
@@ -383,91 +402,27 @@ public class KidsRepository {
     }
 
     /**
-     * Fetches and stores detail data for a single kid asynchronously. If detail data is already
-     * available, then does nothing
+     * Fetches and stores detail data for a single kid asynchronously. If kid already has detail
+     * data, then this does nothing, saving a network call
      */
-    private void fetchAndStoreSingleDetail(String caseNum, String orgPrefix) {
-        Future<MissingKid> response = mExecutor.submit(
-                new FetchAppendedDetailCallable(this, caseNum, orgPrefix));
-        storeAppendedDetail(response);
-    }
-
-    /**
-     * Stores Future appended detail kid data asynchronously
-     *
-     * @param callableResponse
-     */
-    private void storeAppendedDetail(Future<MissingKid> callableResponse) {
-        mExecutor.execute(new StoreAppendedDetailRunnable(callableResponse));
-    }
-
-    /**
-     * Fetches and consolidates detail kid info online into the database. May return a null
-     * MissingKid, in the event the kid does not exist in the database, or if the kid already
-     * has details
-     */
-    private class FetchAppendedDetailCallable implements Callable<MissingKid> {
-        private KidsRepository repo;
-        private String caseNum;
-        private String orgPrefix;
-
-        FetchAppendedDetailCallable(KidsRepository repo, String caseNum, String orgPrefix) {
-            this.repo = repo;
-            this.caseNum = caseNum;
-            this.orgPrefix = orgPrefix;
-        }
-
-        @Override
-        @Nullable
-        public MissingKid call() {
-            @Nullable MissingKid partialKidData = repo.getKidByOrgPrefixCaseNumAsync(orgPrefix + caseNum);
-            if (partialKidData != null) {
-                if (partialKidData.description == null || partialKidData.description.trim().isEmpty()) {
-                    return repo.fetchAndMergeDetailWithKid(partialKidData, caseNum, orgPrefix);
-                } else {
-                    Log.d(TAG + "/fetchAppendDetailCall", "Kid already has detail. Will not fetch...");
-                }
-            } else {
-                Log.w(TAG + "/fetchAppendDetailCall", "No partial kid data returned from local database");
+    private void fetchAndStoreSingleDetail(final MissingKid partialKidData) {
+        mRemoteSyncHelper.fetchSingleDetail(partialKidData, new RemoteSync.RemoteSyncCallback<JSONObject>() {
+            @Override
+            public void onDataReceived(JSONObject response) {
+                MissingKid fullKid = DataParsingUtils.parseDetailDataForMissingKid(response, partialKidData);
+                storeFetchedKids(Collections.singletonList(fullKid));
             }
-            return null;
-        }
-    }
 
-    private class StoreAppendedDetailRunnable implements Runnable {
-        Future<MissingKid> callableResponse;
-
-        StoreAppendedDetailRunnable(Future<MissingKid> callableResponse) {
-            this.callableResponse = callableResponse;
-        }
-
-        @Override
-        public void run() {
-            try {
-                @Nullable MissingKid result = callableResponse.get();
-                if (result != null) {
-                    storeKidsInLocalDb(Collections.singletonList(result));
-                }
-            } catch (InterruptedException | ExecutionException e) {
-                Log.w(TAG + "/storeDetailKidRunnable", "Error getting kids from future task. Not doing anything: " + e);
+            @Override
+            public void onNoDataReturned(String message) {
+                Log.d(TAG + "/fetchSingleDetail", message);
             }
-        }
-    }
 
-    /**
-     * Helper for fetching and appending detail data into partial kid data that already exists
-     * <p>
-     * If the detail data is null, then this returns the original missing kid, untouched
-     * <p>
-     * Needs to be called from a background thread since we're doing data ops
-     *
-     * @param caseNumber
-     * @param orgPrefix
-     * @return
-     */
-    private MissingKid fetchAndMergeDetailWithKid(MissingKid partialKidData, String caseNumber, String orgPrefix) {
-        @Nullable JSONObject detailChildJson = RemoteSync.fetchDetailData(caseNumber, orgPrefix);
-        return DataParsingUtils.parseDetailDataForMissingKid(detailChildJson, partialKidData);
+            @Override
+            public void onFailure(Exception e, @Nullable String message) {
+                Log.w(TAG + "/fetchSingleDetail", "Error getting detail. Not doing anything.\n" + e);
+            }
+        });
     }
 
     //
