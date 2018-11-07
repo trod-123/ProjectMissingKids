@@ -48,6 +48,30 @@ public class KidViewModel extends AndroidViewModel {
     }
 
     /**
+     * Continues the fetch from the last fetched page, for use after a network error interrupted
+     * the paging and fetch process.
+     * <p>
+     * Throws {@link IllegalStateException} if attempting to resume
+     * when {@link KidViewModel#fetchKidsLocalAndRemote(String)} had not yet been called, or when
+     * a search had not yet started during the session
+     */
+    public void resumeRemoteFetch() {
+        if (!mRepository.resumeRemoteSearchFromLastPage()) {
+            throw new IllegalStateException("There is no ongoing search to resume! Start a search first");
+        }
+    }
+
+    /**
+     * Refreshes local and network data. Involves deleting all local data, so this basically
+     * resets the app to a clean slate
+     */
+    public void refreshSearchResult() {
+        mRepository.deleteAll();
+        mRepository.resetRemoteSearchPageNumber();
+        startSearchLiveData.postValue("");
+    }
+
+    /**
      * Stores data gathered from a search called by {@link KidViewModel#fetchKidsLocalAndRemote}
      */
     private MutableLiveData<String> startSearchLiveData = new MutableLiveData<>();

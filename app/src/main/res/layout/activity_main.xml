@@ -6,23 +6,20 @@
     android:layout_height="match_parent"
     tools:context=".ui.MainActivity">
 
-    <!-- A RecyclerView for displaying all the kids list -->
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recyclerview_kids"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/srl_main_kids"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:paddingBottom="8dp"
-        android:scrollbars="vertical" />
+        android:layout_height="match_parent">
 
+        <!-- A RecyclerView for displaying all the kids list -->
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerview_kids"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="8dp"
+            android:scrollbars="vertical" />
 
-    <!-- A progress bar that will be shown to users to indicate that missing kids' data is loading -->
-    <ProgressBar
-        android:id="@+id/pb_loading_indicator"
-        android:layout_width="42dp"
-        android:layout_height="42dp"
-        android:layout_gravity="center"
-        android:visibility="invisible" />
-
+    </android.support.v4.widget.SwipeRefreshLayout>
 
 </FrameLayout>

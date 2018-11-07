@@ -6,7 +6,9 @@ import android.arch.paging.DataSource;
 import android.arch.paging.LivePagedListBuilder;
 import android.arch.paging.PagedList;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -108,6 +110,31 @@ public class KidsRepository {
         return new LivePagedListBuilder<>(mDao.getAllKids(), PAGE_SIZE).build();
     }
 
+    private KidsBoundaryCallback mBoundaryCallback;
+
+    /**
+     * Gives the {@link KidsBoundaryCallback} a manual request to load the next page of data.
+     *
+     * @return true if the search had been resumed. false otherwise
+     */
+    public boolean resumeRemoteSearchFromLastPage() {
+        if (mBoundaryCallback != null) {
+            mBoundaryCallback.requestAndSaveData();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Resets the number of the page last loaded from a remote search. Subsequent search requests
+     * will start and increment from the first page
+     */
+    public void resetRemoteSearchPageNumber() {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(mContext);
+        sp.edit().putInt(KidsBoundaryCallback.KEY_LAST_REQUESTED_PAGE, KidsBoundaryCallback.DEFAULT_LAST_REQUESTED_PAGE).apply();
+    }
+
     /**
      * Generates a {@link PagedList} that is wrapped inside a {@link MissingKidSearchResult},
      * containing a consolidated list of both locally and remotely sourced kids, as well as
@@ -128,9 +155,9 @@ public class KidsRepository {
         DataSource.Factory<Integer, MissingKid> dataSourceFactory = mLocalDataSource.getAllKids();
 
         // Get the boundary callback for refreshing data if needed, from the network
-        KidsBoundaryCallback boundaryCallback = new KidsBoundaryCallback(mRemoteSyncHelper,
+        mBoundaryCallback = new KidsBoundaryCallback(mRemoteSyncHelper,
                 mLocalDataSource, mContext);
-        LiveData<NetworkState> networkState = boundaryCallback.getNetworkState();
+        LiveData<NetworkState> networkState = mBoundaryCallback.getNetworkState();
 
         PagedList.Config pagedListConfig = (new PagedList.Config.Builder())
                 .setEnablePlaceholders(false)
@@ -141,7 +168,7 @@ public class KidsRepository {
         // well as the paging size for the database
         LiveData<PagedList<MissingKid>> data = (
                 new LivePagedListBuilder<>(dataSourceFactory, pagedListConfig))
-                .setBoundaryCallback(boundaryCallback)
+                .setBoundaryCallback(mBoundaryCallback)
                 .setFetchExecutor(mExecutor)
                 .build();
 

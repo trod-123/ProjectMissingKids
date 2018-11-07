@@ -64,7 +64,7 @@ public class KidsBoundaryCallback extends PagedList.BoundaryCallback<MissingKid>
      * Makes a network call to load and display more data. Last requested page is used to
      * determine next page of data. Stops after we've reached the max number of pages
      */
-    private void requestAndSaveData() {
+    public void requestAndSaveData() {
         if (isRequestInProgress || !stillMorePages) return;
 
         isRequestInProgress = true;

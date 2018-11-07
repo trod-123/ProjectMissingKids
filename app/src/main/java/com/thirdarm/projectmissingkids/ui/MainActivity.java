@@ -6,13 +6,13 @@ import android.arch.paging.PagedList;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
-import android.widget.ProgressBar;
 
 import com.thirdarm.projectmissingkids.R;
 import com.thirdarm.projectmissingkids.data.model.MissingKid;
@@ -25,21 +25,18 @@ public class MainActivity extends AppCompatActivity implements
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private KidsAdapter mKidsAdapter;
+    private SwipeRefreshLayout mSwipeRefresh;
     private RecyclerView mRecyclerView;
-    private ProgressBar mLoadingIndicator;
 
     private KidViewModel mViewModel;
-
-    private boolean visible = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mSwipeRefresh = findViewById(R.id.srl_main_kids);
         mRecyclerView = findViewById(R.id.recyclerview_kids);
-
-        mLoadingIndicator = findViewById(R.id.pb_loading_indicator);
 
         LinearLayoutManager layoutManager =
                 new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
@@ -59,30 +56,48 @@ public class MainActivity extends AppCompatActivity implements
         mViewModel.kidsFromSearch.observe(this, new Observer<PagedList<MissingKid>>() {
             @Override
             public void onChanged(@Nullable PagedList<MissingKid> missingKids) {
-                Log.d("KidsAdapter", "OnChanged - submitting list...");
                 mKidsAdapter.submitList(missingKids);
-                if (!visible) {
-                    showView();
-                    visible = true;
-                }
+                if (missingKids == null || missingKids.size() != 0) showView();
             }
         });
         // for the network state
         mViewModel.networkStateFromSearch.observe(this, new Observer<NetworkState>() {
             @Override
             public void onChanged(@Nullable NetworkState networkState) {
-                if (networkState == NetworkState.LOADING) {
-                    // TODO: Wrap network state in via a SwipeRefreshListener and its onRefresh()
-                    // loading animation
-                    //showLoading();
-                } else {
-                    // showView();
+                if (networkState != null) {
+                    NetworkState.Status status = networkState.getStatus();
+                    switch (status) {
+                        case RUNNING:
+                            mSwipeRefresh.setRefreshing(true);
+                            break;
+                        case SUCCESS:
+                            mSwipeRefresh.setRefreshing(false);
+                            break;
+                        case FAILED:
+                            Snackbar.make(mSwipeRefresh, "Error while fetching results. Do you have an internet connection?",
+                                    Snackbar.LENGTH_INDEFINITE).setAction("Retry", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    mViewModel.resumeRemoteFetch();
+                                }
+                            }).show();
+                            mSwipeRefresh.setRefreshing(false);
+                            break;
+                    }
                 }
+            }
+        });
+        mSwipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                mViewModel.refreshSearchResult();
+                showLoading();
+                // Depends on ViewModel observers to dismiss the loading indicators
             }
         });
 
         if (savedInstanceState == null) {
-            // Loads up the ViewModel and the UI with data // TODO: Enable manual refresh of all data from page 1
+            // Loads up the ViewModel and the UI with data
             // Only do this the first time the activity is loaded
             mViewModel.fetchKidsLocalAndRemote(KidViewModel.DEFAULT_SEARCH_QUERY);
             showLoading();
@@ -91,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private void showView() {
         /* First, hide the loading indicator */
-        mLoadingIndicator.setVisibility(View.INVISIBLE);
+        mSwipeRefresh.setRefreshing(false);
         /* Finally, make sure the data is visible */
         mRecyclerView.setVisibility(View.VISIBLE);
     }
@@ -101,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements
         /* Then, hide the data */
         mRecyclerView.setVisibility(View.INVISIBLE);
         /* Finally, show the loading indicator */
-        mLoadingIndicator.setVisibility(View.VISIBLE);
+        mSwipeRefresh.setRefreshing(true);
     }
 
     /**
