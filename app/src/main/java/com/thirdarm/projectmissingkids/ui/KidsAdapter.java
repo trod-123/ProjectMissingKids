@@ -10,14 +10,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 import com.thirdarm.projectmissingkids.R;
 import com.thirdarm.projectmissingkids.data.model.MissingKid;
-import com.thirdarm.projectmissingkids.util.NetworkState;
 
 import java.util.Date;
 
@@ -25,12 +23,6 @@ public class KidsAdapter extends PagedListAdapter<MissingKid, RecyclerView.ViewH
 
     private final Context mContext;
     final private KidsAdapterOnClickHandler mClickHandler;
-    private NetworkState mNetworkState;
-
-    // 2 layout types
-
-    private static final int TYPE_PROGRESS = 0;
-    private static final int TYPE_ITEM = 1;
 
     /**
      * The id is the NCMC number to identify the kid.
@@ -39,15 +31,26 @@ public class KidsAdapter extends PagedListAdapter<MissingKid, RecyclerView.ViewH
         void onClick(String orgPrefix, String caseNum);
     }
 
-    public static DiffUtil.ItemCallback<MissingKid> DIFF_CALLBACK = new DiffUtil.ItemCallback<MissingKid>() {
+    /**
+     * ItemCallback used for paging, which basically refreshes pertinent rows/items based on whether
+     * items are the same or different
+     */
+    private static DiffUtil.ItemCallback<MissingKid> DIFF_CALLBACK = new DiffUtil.ItemCallback<MissingKid>() {
         @Override
         public boolean areItemsTheSame(@NonNull MissingKid oldItem, @NonNull MissingKid newItem) {
-            return oldItem.uid == newItem.uid;
+            boolean same = oldItem.uid == newItem.uid;
+            //Log.d("KidsAdapter", String.format("Are items the same? %s old %s - new %s", same, oldItem.firstName, newItem.firstName));
+            return same;
         }
 
         @Override
         public boolean areContentsTheSame(@NonNull MissingKid oldItem, @NonNull MissingKid newItem) {
-            return oldItem.equals(newItem);
+            boolean same = oldItem.orgPrefixCaseNumber.equals(newItem.orgPrefixCaseNumber);
+            //Log.d("KidsAdapter", String.format("Are contents the same? %s old %s - new %s", same, oldItem.firstName, newItem.firstName));
+            // if this is false, then the items are rewritten and the pertinent views are refreshed
+            // So we need to properly define when two items are "the same", as returning false
+            // may overload the adapter with unnecessary view refreshes
+            return same;
         }
     };
 
@@ -60,99 +63,15 @@ public class KidsAdapter extends PagedListAdapter<MissingKid, RecyclerView.ViewH
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        LayoutInflater inflater = LayoutInflater.from(mContext);
-        if (viewType == TYPE_ITEM) {
-            View view = inflater.inflate(R.layout.kids_list_item, parent, false);
-            return new KidsAdapterViewHolder(view);
-        } else if (viewType == TYPE_PROGRESS) {
-            View view = inflater.inflate(R.layout.loading_list_item, parent, false);
-            return new NetworkIndicatorViewHolder(view);
-        } else {
-            throw new IllegalArgumentException("Unknown viewType passed: " + viewType);
-        }
+        View view = LayoutInflater.from(mContext).inflate(R.layout.kids_list_item, parent, false);
+        return new KidsAdapterViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        if (holder instanceof KidsAdapterViewHolder) {
-            MissingKid kid = getItem(position);
-            if (kid != null) {
-                ((KidsAdapterViewHolder) holder).bind(kid);
-            } else {
-                // TODO: Handle null case (clear the viewholder)
-            }
-        } else if (holder instanceof NetworkIndicatorViewHolder) {
-            ((NetworkIndicatorViewHolder) holder).bind(mNetworkState);
-        } else {
-            throw new IllegalArgumentException("Unknown viewHolder type passed: " + holder.getItemViewType());
-        }
-    }
-
-    /**
-     * For updating the network state, used to show an extra list item or not for the network state
-     *
-     * @param newNetworkState
-     */
-    public void setNetworkState(NetworkState newNetworkState) {
-        NetworkState previousState = mNetworkState;
-        boolean previousExtraRow = hasExtraRow();
-        mNetworkState = newNetworkState;
-        boolean newExtraRow = hasExtraRow();
-        if (previousExtraRow != newExtraRow) {
-            if (previousExtraRow) {
-                notifyItemRemoved(getItemCount());
-            } else {
-                notifyItemInserted(getItemCount());
-            }
-        } else if (newExtraRow && previousState != newNetworkState) {
-            notifyItemChanged(getItemCount() - 1);
-        }
-    }
-
-    /*
-     * For classifying view types
-     */
-    @Override
-    public int getItemViewType(int position) {
-        if (hasExtraRow() && position == getItemCount() - 1) {
-            return TYPE_PROGRESS;
-        } else {
-            return TYPE_ITEM;
-        }
-    }
-
-    /**
-     * Add an extra item for the network state, if available and not loaded
-     *
-     * @return
-     */
-    private boolean hasExtraRow() {
-        return mNetworkState != null && mNetworkState != NetworkState.LOADED;
-    }
-
-    /**
-     * For displaying network indicators when pages are loading or have failed to load
-     * TODO: Consider using SwipeRefreshLayout to house the RecyclerView, and use showRefreshing()
-     * instead (all NetworkIndicator stuff in here will need to be done in MainActivity instead,
-     * and deleted here
-     */
-    class NetworkIndicatorViewHolder extends RecyclerView.ViewHolder {
-        final ProgressBar pb;
-        final TextView tvNetworkStatus;
-
-        public NetworkIndicatorViewHolder(View view) {
-            super(view);
-            pb = view.findViewById(R.id.pb_loading_list_item);
-            tvNetworkStatus = view.findViewById(R.id.tv_loading_list_item);
-        }
-
-        private void bind(NetworkState networkState) {
-            if (networkState.getStatus() == NetworkState.Status.FAILED) {
-                pb.setVisibility(View.GONE);
-            } else {
-                pb.setVisibility(View.VISIBLE);
-            }
-            tvNetworkStatus.setText(networkState.getMsg());
+        MissingKid kid = getItem(position);
+        if (kid != null) {
+            ((KidsAdapterViewHolder) holder).bind(kid);
         }
     }
 

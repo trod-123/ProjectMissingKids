@@ -2,16 +2,23 @@ package com.thirdarm.projectmissingkids.data;
 
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
+import android.arch.paging.DataSource;
+import android.arch.paging.LivePagedListBuilder;
+import android.arch.paging.PagedList;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.thirdarm.projectmissingkids.data.local.LocalDataSource;
 import com.thirdarm.projectmissingkids.data.local.MissingKidDao;
 import com.thirdarm.projectmissingkids.data.local.MissingKidsDatabase;
 import com.thirdarm.projectmissingkids.data.model.MissingKid;
+import com.thirdarm.projectmissingkids.data.model.MissingKidSearchResult;
 import com.thirdarm.projectmissingkids.data.remote.RemoteSync;
 import com.thirdarm.projectmissingkids.util.DataParsingUtils;
+import com.thirdarm.projectmissingkids.util.NetworkState;
 
 import org.json.JSONObject;
 
@@ -27,10 +34,13 @@ import java.util.concurrent.ExecutorService;
 public class KidsRepository {
 
     private static final String TAG = KidsRepository.class.getSimpleName();
+    private static final int PAGE_SIZE = 20;
 
     private MissingKidDao mDao;
+    private Context mContext;
     private ExecutorService mExecutor;
     private RemoteSync mRemoteSyncHelper;
+    private LocalDataSource mLocalDataSource;
 
     /**
      * Callback for passing in database results where LiveData can't be used.
@@ -60,8 +70,10 @@ public class KidsRepository {
 
     public KidsRepository(Application application, ExecutorService executor) {
         mDao = getDao(application);
+        mContext = application;
         mExecutor = executor;
-        mRemoteSyncHelper = new RemoteSync(executor);
+        mRemoteSyncHelper = new RemoteSync(mExecutor);
+        mLocalDataSource = new LocalDataSource(mDao, mExecutor);
     }
 
     private MissingKidDao getDao(Application application) {
@@ -87,21 +99,60 @@ public class KidsRepository {
     }
 
     /**
-     * Get a list of all the kids in the database.
+     * Get a PagedList of all the kids in the local database. Makes no network calls, so this
+     * request is primarily local
      *
      * @return
      */
-    public LiveData<List<MissingKid>> getAllKids() {
-        LiveData<List<MissingKid>> kidsInDb = mDao.getAllKids();
-        // TODO: Sync only if needed
-        fetchAndStoreSinglePage(1);
-        return kidsInDb;
+    public LiveData<PagedList<MissingKid>> getAllKidsFromLocal() {
+        return new LivePagedListBuilder<>(mDao.getAllKids(), PAGE_SIZE).build();
+    }
+
+    /**
+     * Generates a {@link PagedList} that is wrapped inside a {@link MissingKidSearchResult},
+     * containing a consolidated list of both locally and remotely sourced kids, as well as
+     * the latest {@link NetworkState} for updating the UI.
+     * <p>
+     * Asynchronous network calls are facilitated via {@link KidsBoundaryCallback}, which is set
+     * as the PagedList's {@link android.arch.paging.PagedList.BoundaryCallback}
+     * <p>
+     * TODO: Input a query to customize search results. See
+     * {@link com.thirdarm.projectmissingkids.util.NetworkUtils#buildJsonDataBeginSearchUrl} for
+     * current network lookup implementation
+     *
+     * @param query
+     * @return
+     */
+    public MissingKidSearchResult getKidsFromSearch(String query) {
+        // Get data source from local cache
+        DataSource.Factory<Integer, MissingKid> dataSourceFactory = mLocalDataSource.getAllKids();
+
+        // Get the boundary callback for refreshing data if needed, from the network
+        KidsBoundaryCallback boundaryCallback = new KidsBoundaryCallback(mRemoteSyncHelper,
+                mLocalDataSource, mContext);
+        LiveData<NetworkState> networkState = boundaryCallback.getNetworkState();
+
+        PagedList.Config pagedListConfig = (new PagedList.Config.Builder())
+                .setEnablePlaceholders(false)
+                .setPageSize(PAGE_SIZE) // determines how many pages to get, based on # of items desired
+                .build();
+
+        // Build a LiveData<PagedList> using LivePagedListBuilder, passing in the data source as
+        // well as the paging size for the database
+        LiveData<PagedList<MissingKid>> data = (
+                new LivePagedListBuilder<>(dataSourceFactory, pagedListConfig))
+                .setBoundaryCallback(boundaryCallback)
+                .setFetchExecutor(mExecutor)
+                .build();
+
+        return new MissingKidSearchResult(data, networkState);
     }
 
     /**
      * Returns the kid with the matching orgPrefixCaseNum. If there are missing Details, then this
-     * loads the details in a background thread. When details are finished loading, the LiveData's
-     * observer will be notified of the change automatically with additional effort on our part
+     * downloads the details asynchronously. When details are finished downloading, the LiveData's
+     * observer will be notified of the change automatically without any additional work needed
+     * on our part
      *
      * @return
      */

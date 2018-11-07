@@ -2,7 +2,6 @@ package com.thirdarm.projectmissingkids.data.model;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 import android.util.Pair;
 
@@ -11,8 +10,7 @@ import com.thirdarm.projectmissingkids.util.GeneralUtils;
 /**
  * This entity represents a MissingKid table within the MissingKidsDatabase.  Contains all the "columns" of an SQLite database table
  */
-@Entity(tableName = "kids",
-        indices = {@Index(value = {"orgPrefixCaseNumber"}, unique = true)})
+@Entity(tableName = "kids")
 public class MissingKid {
 
     /**
@@ -165,7 +163,7 @@ public class MissingKid {
     public String orgPrefix;
 
     /**
-     * Organization prefix concatenated with Case number (to be used as the unique id)
+     * Organization prefix concatenated with Case number
      * <p>
      * {@code orgPrefix + caseNum}
      */

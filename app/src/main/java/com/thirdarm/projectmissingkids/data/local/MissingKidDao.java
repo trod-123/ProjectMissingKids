@@ -1,6 +1,7 @@
 package com.thirdarm.projectmissingkids.data.local;
 
 import android.arch.lifecycle.LiveData;
+import android.arch.paging.DataSource;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
@@ -40,12 +41,13 @@ public interface MissingKidDao {
     List<MissingKid> getAllKidsAsync();
 
     /**
-     * Gets all the MissingKids currently in the database
+     * Gets all the MissingKids currently in the database, via a DataSourceFactory used for
+     * generating PagedLists
      *
      * @return List of all MissingKids
      */
     @Query("SELECT * FROM kids")
-    LiveData<List<MissingKid>> getAllKids();
+    DataSource.Factory<Integer, MissingKid> getAllKids();
 
     /**
      * Gets the MissingKid with the provided NCMC id

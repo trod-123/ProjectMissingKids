@@ -113,6 +113,8 @@ public class RemoteSync {
 
     /**
      * Gets the number of pages in the query
+     *
+     * TODO: We should be able to get the number of pages from the individual page search results too
      */
     private class FetchNumPagesRunnable extends RunnableCallback<Integer> {
         FetchNumPagesRunnable(RemoteSyncCallback<Integer> callback) {
@@ -232,6 +234,9 @@ public class RemoteSync {
     /**
      * Gets the number of pages. Returns {@link RemoteSync#NO_DATA_RETURNED} if there is no data
      * returned from the server
+     *
+     * TODO: We can get this easily from the same search result page, instead of having to call
+     * the first url over and over again
      *
      * @return
      * @throws JSONException

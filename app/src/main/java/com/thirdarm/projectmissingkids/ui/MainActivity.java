@@ -19,8 +19,6 @@ import com.thirdarm.projectmissingkids.data.model.MissingKid;
 import com.thirdarm.projectmissingkids.util.NetworkState;
 import com.thirdarm.projectmissingkids.viewmodel.KidViewModel;
 
-import java.util.List;
-
 public class MainActivity extends AppCompatActivity implements
         KidsAdapter.KidsAdapterOnClickHandler {
 
@@ -31,8 +29,6 @@ public class MainActivity extends AppCompatActivity implements
     private ProgressBar mLoadingIndicator;
 
     private KidViewModel mViewModel;
-
-    List<MissingKid> kids;
 
     private boolean visible = false;
 
@@ -58,12 +54,12 @@ public class MainActivity extends AppCompatActivity implements
         mKidsAdapter = new KidsAdapter(this, this);
         mRecyclerView.setAdapter(mKidsAdapter);
 
-        Log.d(TAG, "Before observe()");
         // get the instance of the Kids view model and then subscribe to events
         mViewModel = ViewModelProviders.of(this).get(KidViewModel.class);
-        mViewModel.getKidLiveData().observe(this, new Observer<PagedList<MissingKid>>() {
+        mViewModel.kidsFromSearch.observe(this, new Observer<PagedList<MissingKid>>() {
             @Override
             public void onChanged(@Nullable PagedList<MissingKid> missingKids) {
+                Log.d("KidsAdapter", "OnChanged - submitting list...");
                 mKidsAdapter.submitList(missingKids);
                 if (!visible) {
                     showView();
@@ -72,30 +68,25 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
         // for the network state
-        mViewModel.getNetworkState().observe(this, new Observer<NetworkState>() {
+        mViewModel.networkStateFromSearch.observe(this, new Observer<NetworkState>() {
             @Override
             public void onChanged(@Nullable NetworkState networkState) {
-                mKidsAdapter.setNetworkState(networkState);
+                if (networkState == NetworkState.LOADING) {
+                    // TODO: Wrap network state in via a SwipeRefreshListener and its onRefresh()
+                    // loading animation
+                    //showLoading();
+                } else {
+                    // showView();
+                }
             }
         });
 
-
-//        mViewModel.getAllKids().observe(this, new Observer<PagedList<MissingKid>>() {
-//            @Override
-//            public void onChanged(@Nullable PagedList<MissingKid> missingKids) {
-//                if (missingKids == null || missingKids.size() == 0) {
-//                    Toast.makeText(MainActivity.this, "No results", Toast.LENGTH_SHORT).show();
-//                }
-//                Log.d(TAG, "In observe()");
-//                mKidsAdapter.submitList(missingKids);
-//                kids = missingKids;
-//                if (!visible) {
-//                    showView();
-//                    visible = true;
-//                }
-//            }
-//        });
-        showLoading();
+        if (savedInstanceState == null) {
+            // Loads up the ViewModel and the UI with data // TODO: Enable manual refresh of all data from page 1
+            // Only do this the first time the activity is loaded
+            mViewModel.fetchKidsLocalAndRemote(KidViewModel.DEFAULT_SEARCH_QUERY);
+            showLoading();
+        }
     }
 
     private void showView() {
@@ -122,7 +113,6 @@ public class MainActivity extends AppCompatActivity implements
      */
     @Override
     public void onClick(String orgPrefix, String caseNum) {
-        // TODO: For some reason, clicks are not being registered while list is being updated via LiveData
         Intent detailIntent = new Intent(MainActivity.this, DetailActivity.class);
         detailIntent.putExtra(DetailActivity.ORG_PREFIX_KEY, orgPrefix);
         detailIntent.putExtra(DetailActivity.CASE_NUM_KEY, caseNum);
